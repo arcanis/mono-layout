@@ -1,0 +1,20 @@
+{
+    "name": "text-layout",
+    "scripts": {
+        "autogypi": "autogypi",
+        "node-gyp": "node-gyp",
+        "emcc-path": "emcc-path",
+        "build:native": "npm run node-gyp configure build",
+        "build:asmjs": "npm run node-gyp configure build --asmjs=1",
+        "install": "npm run autogypi && npm run build:native",
+        "prepublish": "npm run build:asmjs"
+    },
+    "dependencies": {
+        "autogypi": "^0.2.2",
+        "nbind": "^0.3.6",
+        "node-gyp": "^3.4.0"
+    },
+    "devDependencies": {
+        "glob": "^7.1.1"
+    }
+}

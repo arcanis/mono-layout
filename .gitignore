@@ -1,0 +1,11 @@
+node_modules
+*.a
+*.o
+*.d
+
+*.gypi
+!/final-flags.gypi
+
+/build
+
+npm-debug.log*
