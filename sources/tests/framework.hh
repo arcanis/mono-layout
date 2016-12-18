@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include <catch.hpp>
 
 #include "./../tools/TextOutput.hh"
@@ -20,7 +22,9 @@
     auto offset = (OFFSET);                                          \
     auto length = (LENGTH);                                          \
                                                                      \
-    std::string replacement = (REPLACEMENT);                         \
+    std::ostringstream replacementBuilder;                           \
+    replacementBuilder << (REPLACEMENT);                             \
+    std::string replacement = replacementBuilder.str();              \
                                                                      \
     provider.update(offset, length, replacement);                    \
     output.apply(layout.update(offset, length, replacement.size())); \
@@ -45,3 +49,7 @@
 ({                         \
     output.getLineCount(); \
 })
+
+#define FOR(C, STR)                 \
+                                    \
+    for (auto c : std::string(STR))

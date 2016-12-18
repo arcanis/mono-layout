@@ -43,7 +43,6 @@ struct Position {
 
     void toJS(nbind::cbOutput output) const
     {
-        std::cout << "x " << x << " y " << y << std::endl;
         output(x, y);
     }
 

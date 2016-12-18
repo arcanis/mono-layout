@@ -108,7 +108,7 @@ TokenLocator TextLayout::findTokenLocatorForPosition(Position const & position) 
     });
 
     if (tokenIterator == line.tokens.end())
-        tokenIterator = line.tokens.end() - 1;
+        tokenIterator -= 1;
 
     unsigned tokenIndex = tokenIterator - line.tokens.begin();
     Token const & token = *tokenIterator;
@@ -472,8 +472,8 @@ Patch TextLayout::reset(void)
 Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
 {
 #ifndef NBIND
-    #define GET_CHARACTER_COUNT() (*m_getCharacterCount)()
-    #define GET_CHARACTER(OFFSET) (*m_getCharacter)(OFFSET)
+    #define GET_CHARACTER_COUNT() m_getCharacterCount()
+    #define GET_CHARACTER(OFFSET) m_getCharacter(OFFSET)
 #else
     #define GET_CHARACTER_COUNT() m_getCharacterCount->call<unsigned>()
     #define GET_CHARACTER(OFFSET) m_getCharacter->call<char>(OFFSET)
@@ -738,7 +738,7 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
 
         }
 
-        if (offset > currentLine.inputOffset + currentLine.inputLength) {
+        if (offset > currentLine.inputOffset + currentLine.inputLength || currentLine.tokens.size() == 0) {
 
             Token token = Token(TOKEN_DYNAMIC);
 
@@ -768,32 +768,38 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
                 return token.type == TOKEN_WHITESPACES && token.outputOffset > 0;
             }));
 
-            // Hold the number of spaces we will have to add on each slot (=> ceil(missingSpaceCount / availableSlotCount))
-            auto spacesPerSlot = 1u + ((missingSpaceCount - 1u) / availableSlotCount);
+            if (availableSlotCount > 0) {
 
-            for (auto & token : currentLine.tokens) {
+                // Hold the number of spaces we will have to add on each slot (=> ceil(missingSpaceCount / availableSlotCount))
+                auto spacesPerSlot = 1u + ((missingSpaceCount - 1u) / availableSlotCount);
 
-                token.outputOffset += extraSpaceCount;
+                for (auto & token : currentLine.tokens) {
 
-                if (missingSpaceCount > 0 && token.type == TOKEN_WHITESPACES && token.outputOffset > 0) {
+                    token.outputOffset += extraSpaceCount;
 
-                    auto localSpaceCount = std::min(spacesPerSlot, missingSpaceCount);
+                    if (missingSpaceCount > 0 && token.type == TOKEN_WHITESPACES && token.outputOffset > 0) {
 
-                    token.canBeSubdivided = false;
+                        auto localSpaceCount = std::min(spacesPerSlot, missingSpaceCount);
 
-                    token.outputLength += localSpaceCount;
-                    token.string += std::string(localSpaceCount, ' ');
+                        token.canBeSubdivided = false;
 
-                    extraSpaceCount += localSpaceCount;
-                    missingSpaceCount -= localSpaceCount;
+                        token.outputLength += localSpaceCount;
+                        token.string += std::string(localSpaceCount, ' ');
 
-                    currentLine.outputLength += localSpaceCount;
+                        extraSpaceCount += localSpaceCount;
+                        missingSpaceCount -= localSpaceCount;
+
+                        currentLine.outputLength += localSpaceCount;
+
+                    }
 
                 }
 
             }
 
         }
+
+        assert(currentLine.tokens.size() > 0);
 
         for (auto & token : currentLine.tokens)
             currentLine.string += token.string;

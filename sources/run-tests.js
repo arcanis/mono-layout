@@ -3,7 +3,10 @@ let fs = require(`fs`);
 let glob = require(`glob`);
 let vm = require(`vm`);
 
-let bindings = require(`./entry-browser`);
+let bindings = require(`./entry-${process.argv[2]}`);
+
+let ok = `${ts.style.color.front(`green`).in}✓${ts.style.color.front.out}`;
+let ko = `${ts.style.color.front(`red`).in}✗${ts.style.color.front.out}`;
 
 class TestSuite {
 
@@ -35,9 +38,9 @@ class TestSuite {
 
             try {
                 test.fn(testsuite, makeEnv());
-                console.log(`${indent} ${ts.style.color.front(`green`).in}✓${ts.style.color.front.out} ${test.label}`);
+                console.log(`${indent} ${ok} ${test.label}`);
             } catch (err) {
-                console.log(`${indent} ${ts.style.color.front(`red`).in}✗${ts.style.color.front.out} ${test.label} (${err.message || err})`);
+                console.log(`${indent} ${ko} ${test.label} (${err.message || err})`);
             }
 
             testsuite.run(level + 1);
@@ -90,7 +93,7 @@ function makeEnv() {
 
     function APPEND(appendStr) {
 
-        SPLICE(0, str.length, appendStr);
+        SPLICE(str.length, 0, appendStr);
 
     }
 
@@ -118,22 +121,28 @@ function makeEnv() {
 
 }
 
-for (let file of glob.sync(`**/*.test.cc`, { cwd: __dirname })) {
+let testsuite = new TestSuite();
 
-    console.log(`Processing ${file}`);
+for (let file of glob.sync(`**/*.test.cc`, { cwd: __dirname })) {
 
     let content = fs.readFileSync(`${__dirname}/${file}`).toString();
 
+    if (!content.includes(`REQUIRE`))
+        continue;
+
     content = content.replace(/^[ \t]*#.*/gm, ``);
     content = content.replace(/(TEST_CASE|SECTION)\((.*)\)$/gm, `testsuite.register($2).fn = (testsuite, env) =>`);
+    content = content.replace(/FOR\(([^,]+),/g, `for (let $1 of `);
     content = content.replace(/([A-Z][A-Z_]*)\(/g, `env.$1(`);
     content = content.replace(/==/g, `+''==''+`);
     content = content.replace(/\b(layout|Position)\b/g, `env.$1`);
     content = content.replace(/([0-9])u/g, `$1`);
     content = content.replace(/\bauto\b/g, `let`);
 
-    let testsuite = new TestSuite();
-    vm.runInNewContext(content, { console, JSON, testsuite });
-    testsuite.run();
+    testsuite.register(file).fn = testsuite => {
+        vm.runInNewContext(content, { console, JSON, testsuite });
+    };
 
 }
+
+testsuite.run();
