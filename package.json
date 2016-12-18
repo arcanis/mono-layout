@@ -1,5 +1,7 @@
 {
-    "name": "text-layout",
+    "name": "@manaflair/text-layout",
+    "version": "0.0.1",
+    "license": "MIT",
 
     "main": "./sources/entry-node",
     "browser": "./sources/entry-browser",
