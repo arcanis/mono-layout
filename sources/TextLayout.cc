@@ -5,7 +5,7 @@
 #include <sstream>
 #include <string>
 
-#ifdef EMSCRIPTEN
+#ifdef NBIND
 # include <nbind/api.h>
 #endif
 
@@ -69,7 +69,7 @@ void TextLayout::setJustifyText(bool justifyText)
     m_justifyText = justifyText;
 }
 
-#ifndef EMSCRIPTEN
+#ifndef NBIND
 
 void TextLayout::setCharacterGetter(std::function<char(unsigned)> const & characterGetter)
 {
@@ -85,12 +85,12 @@ void TextLayout::setCharacterCountGetter(std::function<unsigned(void)> const & c
 
 void TextLayout::setCharacterGetter(nbind::cbFunction & characterGetter)
 {
-    m_getCharacter = characterGetter;
+    m_getCharacter.reset(new nbind::cbFunction(characterGetter));
 }
 
 void TextLayout::setCharacterCountGetter(nbind::cbFunction & characterCountGetter)
 {
-    m_getCharacterCount = characterCountGetter;
+    m_getCharacterCount.reset(new nbind::cbFunction(characterCountGetter));
 }
 
 #endif
@@ -457,10 +457,10 @@ Patch TextLayout::reset(void)
     auto deletedLineCount = m_lines.size();
     m_lines = { Line() };
 
-#ifndef EMSCRIPTEN
+#ifndef NBIND
     auto characterCount = m_getCharacterCount();
 #else
-    auto characterCount = m_getCharacterCount.call<unsigned>();
+    auto characterCount = m_getCharacterCount->call<unsigned>();
 #endif
 
     Patch patch = this->update(0, m_lines.back().inputOffset + m_lines.back().inputLength, characterCount);
@@ -471,12 +471,12 @@ Patch TextLayout::reset(void)
 
 Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
 {
-#ifndef EMSCRIPTEN
-    #define GET_CHARACTER_COUNT() m_getCharacterCount()
-    #define GET_CHARACTER(OFFSET) m_getCharacter(OFFSET)
+#ifndef NBIND
+    #define GET_CHARACTER_COUNT() (*m_getCharacterCount)()
+    #define GET_CHARACTER(OFFSET) (*m_getCharacter)(OFFSET)
 #else
-    #define GET_CHARACTER_COUNT() m_getCharacterCount.call<unsigned>()
-    #define GET_CHARACTER(OFFSET) m_getCharacter.call<char>(OFFSET)
+    #define GET_CHARACTER_COUNT() m_getCharacterCount->call<unsigned>()
+    #define GET_CHARACTER(OFFSET) m_getCharacter->call<char>(OFFSET)
 #endif
 
     #define SET_OFFSET(OFFSET) do { offset = (OFFSET); offsetChar = offset < offsetMax ? GET_CHARACTER(offset) : '?'; } while (0)

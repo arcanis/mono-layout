@@ -9,7 +9,11 @@
 	"sources": [
 	    "sources/nbind.cc",
 	    "sources/TextLayout.cc",
-	]
+	],
+
+        "cflags": [
+            "-DNBIND"
+        ]
 
     } ],
 

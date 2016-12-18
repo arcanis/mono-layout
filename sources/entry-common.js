@@ -1,31 +1,32 @@
 module.exports = function (bind, lib) {
 
-    let exports = {};
+    function patch(className, methodName, replacement) {
 
-    let Position = function (x, y) {
+        let original = lib[className].prototype[methodName];
 
-        this.x = x;
-        this.y = y;
+        lib[className].prototype[methodName] = function (... args) {
+            return replacement.apply(this, [ this, original, ... args ]);
+        };
 
+    }
+
+    var Position = function (x, y) {
+        Object.assign(this, { x, y });
     };
 
     Position.prototype.fromJS = function (output) {
-
         output(this.x, this.y);
-
     };
 
     Position.prototype.toString = function () {
-
         return this.x + ':' + this.y;
-
     };
 
     bind(`Position`, Position);
 
-    exports.Position = Position;
-    exports.TextLayout = lib.TextLayout;
+    patch(`TextLayout`, `getPositionAbove`, (self, original, position, amplitude = 1) => original.call(self, position, amplitude));
+    patch(`TextLayout`, `getPositionBelow`, (self, original, position, amplitude = 1) => original.call(self, position, amplitude));
 
-    return exports;
+    return { Position, TextLayout: lib.TextLayout };
 
 };

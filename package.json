@@ -6,6 +6,7 @@
         "emcc-path": "emcc-path",
         "build:native": "npm run node-gyp configure build",
         "build:asmjs": "npm run node-gyp configure build --asmjs=1",
+        "build": "npm run build:native && npm run build:asmjs",
         "install": "npm run autogypi && npm run build:native",
         "prepublish": "npm run build:asmjs"
     },
@@ -15,6 +16,7 @@
         "node-gyp": "^3.4.0"
     },
     "devDependencies": {
+        "@manaflair/term-strings": "^0.3.0",
         "glob": "^7.1.1"
     }
 }

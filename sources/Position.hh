@@ -1,7 +1,10 @@
 #pragma once
 
-#ifdef EMSCRIPTEN
+#include <iostream>
+
+#ifdef NBIND
 # include <nbind/api.h>
+# include <nbind/BindDefiner.h>
 #endif
 
 struct Position {
@@ -36,10 +39,11 @@ struct Position {
         return x == other.x && y == other.y;
     }
 
-#ifdef EMSCRIPTEN
+#ifdef NBIND
 
     void toJS(nbind::cbOutput output) const
     {
+        std::cout << "x " << x << " y " << y << std::endl;
         output(x, y);
     }
 

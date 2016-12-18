@@ -1,9 +1,10 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 #include <vector>
 
-#ifdef EMSCRIPTEN
+#ifdef NBIND
 # include <nbind/api.h>
 #endif
 
@@ -31,7 +32,7 @@ class TextLayout {
 
  public:
 
-#ifndef EMSCRIPTEN
+#ifndef NBIND
 
     void setCharacterGetter(std::function<char(unsigned)> const & m_getCharacter);
     void setCharacterCountGetter(std::function<unsigned(void)> const & m_getCharacterCount);
@@ -90,15 +91,15 @@ class TextLayout {
     bool m_demoteNewlines;
     bool m_justifyText;
 
-#ifndef EMSCRIPTEN
+#ifndef NBIND
 
     std::function<char(unsigned)> m_getCharacter;
     std::function<unsigned(void)> m_getCharacterCount;
 
 #else
 
-    nbind::cbFunction m_getCharacter;
-    nbind::cbFunction m_getCharacterCount;
+    std::unique_ptr<nbind::cbFunction> m_getCharacter;
+    std::unique_ptr<nbind::cbFunction> m_getCharacterCount;
 
 #endif
 

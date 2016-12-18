@@ -1,3 +1,4 @@
+let ts = require(`@manaflair/term-strings`);
 let fs = require(`fs`);
 let glob = require(`glob`);
 let vm = require(`vm`);
@@ -21,7 +22,12 @@ class TestSuite {
 
     }
 
-    run() {
+    run(level = 0) {
+
+        let indent = ` `.repeat(level * 4);
+
+        if (level > 0 && this.tests.length > 0)
+            console.log(``);
 
         for (let test of this.tests) {
 
@@ -29,12 +35,17 @@ class TestSuite {
 
             try {
                 test.fn(testsuite, makeEnv());
+                console.log(`${indent} ${ts.style.color.front(`green`).in}✓${ts.style.color.front.out} ${test.label}`);
             } catch (err) {
-                console.log(`Test Failed: ${test.label} (${err.message || err})`);
+                console.log(`${indent} ${ts.style.color.front(`red`).in}✗${ts.style.color.front.out} ${test.label} (${err.message || err})`);
             }
 
-            testsuite.run();
+            testsuite.run(level + 1);
 
+        }
+
+        if (level > 0 && this.tests.length > 0) {
+            console.log(``);
         }
 
     }
@@ -103,7 +114,7 @@ function makeEnv() {
 
     }
 
-    return { layout, SETUP, RESET, SPLICE, APPEND, LINE_COUNT, TEXT, REQUIRE, Position: (x, y) => ({ x, y }) };
+    return { layout, SETUP, RESET, SPLICE, APPEND, LINE_COUNT, TEXT, REQUIRE, Position: (x, y) => new bindings.Position(x, y) };
 
 }
 
@@ -114,8 +125,9 @@ for (let file of glob.sync(`**/*.test.cc`, { cwd: __dirname })) {
     let content = fs.readFileSync(`${__dirname}/${file}`).toString();
 
     content = content.replace(/^[ \t]*#.*/gm, ``);
-    content = content.replace(/(TEST_CASE|SECTION)\(([^)]+)\)/g, `testsuite.register($2).fn = (testsuite, env) =>`);
+    content = content.replace(/(TEST_CASE|SECTION)\((.*)\)$/gm, `testsuite.register($2).fn = (testsuite, env) =>`);
     content = content.replace(/([A-Z][A-Z_]*)\(/g, `env.$1(`);
+    content = content.replace(/==/g, `+''==''+`);
     content = content.replace(/\b(layout|Position)\b/g, `env.$1`);
     content = content.replace(/([0-9])u/g, `$1`);
     content = content.replace(/\bauto\b/g, `let`);
