@@ -43,5 +43,5 @@ void TextOutput::apply(Patch const & patch)
     assert(patch.startingRow + patch.deletedLineCount <= m_lines.size());
 
     m_lines.erase(m_lines.begin() + patch.startingRow, m_lines.begin() + patch.startingRow + patch.deletedLineCount);
-    m_lines.insert(m_lines.begin() + patch.startingRow, patch.addedLines.begin(), patch.addedLines.end());
+    m_lines.insert(m_lines.begin() + patch.startingRow, patch.addedLineStrings.begin(), patch.addedLineStrings.end());
 }

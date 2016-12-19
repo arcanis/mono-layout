@@ -6,6 +6,8 @@
 
 NBIND_CLASS(Patch)
 {
+    construct<>();
+
     getter(getStartingRow);
     getter(getDeletedLineCount);
     getter(getAddedLines);
@@ -35,6 +37,10 @@ NBIND_CLASS(TextLayout)
 
     method(setCharacterGetter);
     method(setCharacterCountGetter);
+
+    method(getRowCount);
+    method(getColumnCount);
+    method(getSoftWrapCount);
 
     method(getFixedPosition);
     method(getPositionLeft);

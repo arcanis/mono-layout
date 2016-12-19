@@ -25,8 +25,50 @@ TextLayout::TextLayout(void)
 , m_justifyText(false)
 , m_getCharacter()
 , m_getCharacterCount()
+, m_lineSizeContainer()
+, m_softWrapCount(0)
 , m_lines{ Line{ Token(TOKEN_DYNAMIC) } }
 {
+}
+
+unsigned TextLayout::getColumns(void) const
+{
+    return m_columns;
+}
+
+unsigned TextLayout::getTabWidth(void) const
+{
+    return m_tabWidth;
+}
+
+bool TextLayout::getCollapseWhitespaces(void) const
+{
+    return m_collapseWhitespaces;
+}
+
+bool TextLayout::getPreserveLeadingSpaces(void) const
+{
+    return m_preserveLeadingSpaces;
+}
+
+bool TextLayout::getPreserveTrailingSpaces(void) const
+{
+    return m_preserveTrailingSpaces;
+}
+
+bool TextLayout::getAllowWordBreaks(void) const
+{
+    return m_allowWordBreaks;
+}
+
+bool TextLayout::getDemoteNewlines(void) const
+{
+    return m_demoteNewlines;
+}
+
+bool TextLayout::getJustifyText(void) const
+{
+    return m_justifyText;
 }
 
 void TextLayout::setColumns(unsigned columns)
@@ -94,6 +136,21 @@ void TextLayout::setCharacterCountGetter(nbind::cbFunction & characterCountGette
 }
 
 #endif
+
+unsigned TextLayout::getRowCount(void) const
+{
+    return m_lines.size();
+}
+
+unsigned TextLayout::getColumnCount(void) const
+{
+    return m_lineSizeContainer.getMaxSize();
+}
+
+unsigned TextLayout::getSoftWrapCount(void) const
+{
+    return m_softWrapCount;
+}
 
 TokenLocator TextLayout::findTokenLocatorForPosition(Position const & position) const
 {
@@ -500,11 +557,8 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
     #define NEW_TOKEN(TYPE) ({ Token token = Token(TYPE); token.inputOffset = currentLine.inputLength; token.outputOffset = currentLine.outputLength; token; })
     #define PUSH_TOKEN(TOKEN) do { Token const & _token = (TOKEN); currentLine.tokens.push_back(_token); currentLine.inputLength += _token.inputLength; currentLine.outputLength += _token.outputLength; } while (0)
 
-    // Create a structure that we will use to return a proper layout update (startingRow, removedLineCount & replacement)
+    // Create a structure that we will use to return a proper layout update (startingRow, removedLineCount & addedLines)
     Patch patch;
-
-    // Create a container that we will use to temporarily store our newly created lines and tokens
-    std::vector<Line> generatedLines;
 
     // Compute the rows that surround the removed line segment
     auto rowStart = this->getRowForCharacterIndex(start);
@@ -536,8 +590,8 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
         // Find its predecessor
         Line const * previousLine = nullptr;
 
-        if (generatedLines.size() > 0)
-            previousLine = &(generatedLines.back());
+        if (patch.addedLines.size() > 0)
+            previousLine = &(patch.addedLines.back());
         else if (rowStart > 0)
             previousLine = &(m_lines.at(rowStart - 1));
 
@@ -548,7 +602,7 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
         currentLine.outputOffset = previousLine ? previousLine->outputOffset + previousLine->outputLength : 0;
 
         // Check if the first characters are whitespaces and if they need to be removed (only if we're on the start of a new hard-line, or on the start of a soft-line but only when collapsing whitespaces)
-        if (IS_WHITESPACE() && (!m_preserveLeadingSpaces || (m_collapseWhitespaces && previousLine && !previousLine->hasNewline))) {
+        if (IS_WHITESPACE() && (!m_preserveLeadingSpaces || (m_collapseWhitespaces && previousLine && !previousLine->doesSoftWrap))) {
 
             Token token = Token(TOKEN_DYNAMIC);
 
@@ -703,20 +757,15 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
 
         assert(offset >= currentLine.inputOffset + currentLine.inputLength);
 
-        if (IS_NEWLINE()) {
+        currentLine.doesSoftWrap = !IS_END_OF_LINE();
 
-            currentLine.hasNewline = true;
+        auto hasNewline = IS_NEWLINE();
 
+        if (hasNewline)
             SHIFT_CHARACTER();
 
-        } else {
-
-            currentLine.hasNewline = false;
-
-        }
-
         // if we don't care about trailing and/or if we need to collapse our whitespaces and we're on a soft-wrapping line
-        if (!m_preserveTrailingSpaces || ((m_collapseWhitespaces || m_justifyText) && !currentLine.hasNewline && !IS_END_OF_FILE())) {
+        if (!m_preserveTrailingSpaces || ((m_collapseWhitespaces || m_justifyText) && currentLine.doesSoftWrap && !IS_END_OF_FILE())) {
 
             auto tokenIterator = currentLine.tokens.rbegin();
 
@@ -801,14 +850,13 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
 
         assert(currentLine.tokens.size() > 0);
 
+        std::string lineString;
+
         for (auto & token : currentLine.tokens)
-            currentLine.string += token.string;
+            lineString += token.string;
 
-        // Remember: this vector only holds the string we will expose to the userland code
-        patch.addedLines.push_back(currentLine.string);
-
-        // And THIS vector holds our internal state structures, but not the generated strings
-        generatedLines.push_back(currentLine);
+        patch.addedLines.push_back(currentLine);
+        patch.addedLineStrings.push_back(lineString);
 
         while (rowStart + patch.deletedLineCount != m_lines.size() && m_lines.at(rowStart + patch.deletedLineCount).inputOffset + added < offset + removed)
             patch.deletedLineCount += 1;
@@ -816,21 +864,50 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
         if (rowStart + patch.deletedLineCount != m_lines.size() && m_lines.at(rowStart + patch.deletedLineCount).inputOffset + added == offset + removed)
             break;
 
-        if (!currentLine.hasNewline && IS_END_OF_FILE()) {
+        if (!hasNewline && IS_END_OF_FILE()) {
             break;
         }
 
     } // end of line loop
 
-    m_lines.erase(m_lines.begin() + rowStart, m_lines.begin() + rowStart + patch.deletedLineCount);
-    m_lines.insert(m_lines.begin() + rowStart, generatedLines.begin(), generatedLines.end());
+    this->apply(patch);
 
-    for (unsigned t = std::max(1u, static_cast<unsigned>(rowStart + generatedLines.size())); t < m_lines.size(); ++t) {
+    return patch;
+}
+
+void TextLayout::apply(Patch const & patch)
+{
+    for (unsigned t = 0u; t < patch.deletedLineCount; ++t) {
+
+        Line const & line = m_lines.at(patch.startingRow + t);
+
+        m_lineSizeContainer.decrease(line.outputLength);
+
+        if (line.doesSoftWrap) {
+            m_softWrapCount -= 1;
+        }
+
+    }
+
+    m_lines.erase(m_lines.begin() + patch.startingRow, m_lines.begin() + patch.startingRow + patch.deletedLineCount);
+    m_lines.insert(m_lines.begin() + patch.startingRow, patch.addedLines.begin(), patch.addedLines.end());
+
+    for (unsigned t = 0u; t < patch.addedLines.size(); ++t) {
+
+        Line const & line = m_lines.at(patch.startingRow + t);
+
+        m_lineSizeContainer.increase(line.outputLength);
+
+        if (line.doesSoftWrap) {
+            m_softWrapCount += 1;
+        }
+
+    }
+
+    for (unsigned t = std::max(1u, static_cast<unsigned>(patch.startingRow + patch.addedLines.size())); t < m_lines.size(); ++t) {
         m_lines.at(t).inputOffset = m_lines.at(t - 1).inputOffset + m_lines.at(t - 1).inputLength;
         m_lines.at(t).outputOffset = m_lines.at(t - 1).outputOffset + m_lines.at(t - 1).outputLength;
     }
-
-    return patch;
 }
 
 #ifdef DEBUG
@@ -853,7 +930,6 @@ void TextLayout::dump(std::vector<Line> const & lines) const
             << "    inputLength  = " << line.inputLength << std::endl
             << "    outputOffset = " << line.outputOffset << std::endl
             << "    outputLength = " << line.outputLength << std::endl
-            << "    string       = '" << line.string << "'" << std::endl
         ;
 
         for (auto t = 0u; t < line.tokens.size(); ++t) {

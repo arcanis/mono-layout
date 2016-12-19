@@ -136,3 +136,92 @@ TEST_CASE("#getPositionBelow()")
         REQUIRE(layout.getPositionBelow(Position(5, 0)) == Position(11, 0));
     }
 }
+
+TEST_CASE("#getRowCount()")
+{
+    SECTION("it should return the right number of rows in the document")
+    {
+        SETUP("Hello World\nThis is a test\nFoo Bar\n");
+
+        REQUIRE(layout.getRowCount() == 4);
+    }
+
+    SECTION("it should also count soft-wrapped lines")
+    {
+        SETUP("Horse Tiger Snake Zebra Mouse Sheep Whale Panda");
+
+        layout.setColumns(8);
+        RESET();
+
+        REQUIRE(layout.getRowCount() == 8);
+    }
+}
+
+TEST_CASE("#getColumnCount()")
+{
+    SECTION("it should return the maximal number of columns in the document")
+    {
+        SETUP("This is a test\nHello World\nSanctus Dominus Infernus\n");
+
+        REQUIRE(layout.getColumnCount() == 24);
+    }
+
+    SECTION("it should be correctly updated when lines are removed")
+    {
+        SETUP("This is a test\nHello World\nSanctus Dominus Infernus\n");
+
+        SPLICE(27, 24, "");
+
+        REQUIRE(layout.getColumnCount() == 14);
+    }
+
+    SECTION("it should be correctly updated when lines are added")
+    {
+        SETUP("This is a test\nHello World\nSanctus Dominus Infernus\n");
+
+        SPLICE(27, 0, "Space 1992: Rise of the Chaos Wizards\n");
+
+        REQUIRE(layout.getColumnCount() == 37);
+    }
+
+    SECTION("it should be correctly updated when lines are expanded")
+    {
+        SETUP("This is a test\nHello World\nSanctus Dominus Infernus\n");
+
+        SPLICE(15, 0, "As Foobar Sayed: ");
+
+        REQUIRE(layout.getColumnCount() == 28);
+    }
+
+    SECTION("it should be correctly updated when lines are shrinked")
+    {
+        SETUP("This is a test\nHello World\nSanctus Dominus Infernus\n");
+
+        SPLICE(27, 16, "");
+
+        REQUIRE(layout.getColumnCount() == 14);
+    }
+}
+
+TEST_CASE("#getSoftWrapCount()")
+{
+    SECTION("it should return the number of soft-wrap-generated lines accross the text")
+    {
+        SETUP("Horse Tiger Snake Zebra Mouse Sheep Whale Panda");
+
+        layout.setColumns(8);
+        RESET();
+
+        REQUIRE(layout.getSoftWrapCount() == 7);
+    }
+
+    SECTION("it shouldn't count the last line as being soft-wrapped, even when being as large as the maximal size")
+    {
+        SETUP("Horse Tiger Snake Zebra Mouse Sheep Whale Panda");
+
+        layout.setColumns(5);
+        RESET();
+
+        REQUIRE(layout.getSoftWrapCount() == 7);
+    }
+}

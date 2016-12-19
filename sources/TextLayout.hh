@@ -8,6 +8,7 @@
 # include <nbind/api.h>
 #endif
 
+#include "./LineSizeContainer.hh"
 #include "./Line.hh"
 #include "./Patch.hh"
 #include "./Position.hh"
@@ -19,10 +20,23 @@ class TextLayout {
 
     TextLayout(void);
 
- public:
+ public: // options getters
+
+    unsigned getColumns(void) const;
+    unsigned getTabWidth(void) const;
+
+    bool getCollapseWhitespaces(void) const;
+    bool getPreserveLeadingSpaces(void) const;
+    bool getPreserveTrailingSpaces(void) const;
+    bool getAllowWordBreaks(void) const;
+    bool getDemoteNewlines(void) const;
+    bool getJustifyText(void) const;
+
+ public: // options setters
 
     void setColumns(unsigned columns);
     void setTabWidth(unsigned tabWidth);
+
     void setCollapseWhitespaces(bool collapseWhitespaces);
     void setPreserveLeadingSpaces(bool preserveLeadingSpaces);
     void setPreserveTrailingSpaces(bool preserveTrailingSpaces);
@@ -30,7 +44,7 @@ class TextLayout {
     void setDemoteNewlines(bool demoteNewlines);
     void setJustifyText(bool justifyText);
 
- public:
+ public: // interfacing callbacks
 
 #ifndef NBIND
 
@@ -44,7 +58,13 @@ class TextLayout {
 
 #endif
 
- public:
+ public: // state info getters
+
+    unsigned getRowCount(void) const;
+    unsigned getColumnCount(void) const;
+    unsigned getSoftWrapCount(void) const;
+
+ public: // cursor management
 
     Position getFixedPosition(Position position) const;
 
@@ -54,7 +74,7 @@ class TextLayout {
     Position getPositionAbove(Position position, unsigned amplitude = 1) const;
     Position getPositionBelow(Position position, unsigned amplitude = 1) const;
 
- public:
+ public: // pointers conversions
 
     unsigned getRowForCharacterIndex(unsigned characterIndex) const;
     unsigned getCharacterIndexForRow(unsigned row) const;
@@ -62,19 +82,23 @@ class TextLayout {
     Position getPositionForCharacterIndex(unsigned characterIndex) const;
     unsigned getCharacterIndexForPosition(Position position) const;
 
- public:
+ public: // state mutators
 
     Patch reset(void);
     Patch update(unsigned start, unsigned deleted, unsigned added);
 
 #ifdef DEBUG
 
- public:
+ public: // debug only
 
     void dump(std::vector<Line> const & generatedLines) const;
     void dump(void) const;
 
 #endif
+
+ private:
+
+    void apply(Patch const & patch);
 
  private:
 
@@ -84,6 +108,7 @@ class TextLayout {
 
     unsigned m_columns;
     unsigned m_tabWidth;
+
     bool m_collapseWhitespaces;
     bool m_preserveLeadingSpaces;
     bool m_preserveTrailingSpaces;
@@ -102,6 +127,9 @@ class TextLayout {
     std::unique_ptr<nbind::cbFunction> m_getCharacterCount;
 
 #endif
+
+    LineSizeContainer m_lineSizeContainer;
+    unsigned m_softWrapCount;
 
     std::vector<Line> m_lines;
 

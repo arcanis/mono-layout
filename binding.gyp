@@ -8,7 +8,8 @@
 
 	"sources": [
 	    "sources/nbind.cc",
-	    "sources/TextLayout.cc",
+            "sources/LineSizeContainer.cc",
+	    "sources/TextLayout.cc"
 	],
 
         "cflags": [

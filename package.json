@@ -1,6 +1,6 @@
 {
     "name": "@manaflair/text-layout",
-    "version": "0.0.1",
+    "version": "0.2.0",
     "license": "MIT",
 
     "main": "./sources/entry-node",
@@ -17,8 +17,8 @@
         "build:all": "npm run build:native && npm run build:asmjs",
         "build": "npm run build:all",
 
-        "test:native": "node sources/run-tests node",
-        "test:asmjs": "node sources/run-tests browser",
+        "test:native": "time node sources/run-tests node",
+        "test:asmjs": "time node sources/run-tests browser",
         "test:all": "npm run test:native && npm run test:asmjs",
         "test": "npm run test:all",
 

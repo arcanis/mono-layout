@@ -14,19 +14,19 @@ struct Line {
     unsigned outputOffset;
     unsigned outputLength;
 
+    bool doesSoftWrap;
     bool hasNewline;
 
     std::vector<Token> tokens;
-    std::string string;
 
     Line(void)
     : inputOffset(0)
     , inputLength(0)
     , outputOffset(0)
     , outputLength(0)
+    , doesSoftWrap(false)
     , hasNewline(false)
     , tokens{}
-    , string("")
     {
     }
 
@@ -35,9 +35,9 @@ struct Line {
     , inputLength(0)
     , outputOffset(0)
     , outputLength(0)
+    , doesSoftWrap(false)
     , hasNewline(false)
     , tokens(tokens)
-    , string("")
     {
     }
 

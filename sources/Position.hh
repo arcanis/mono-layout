@@ -1,6 +1,8 @@
 #pragma once
 
-#include <iostream>
+#ifdef DEBUG
+# include <iostream>
+#endif
 
 #ifdef NBIND
 # include <nbind/api.h>
@@ -24,6 +26,13 @@ struct Position {
     {
     }
 
+    bool operator==(Position const & other) const
+    {
+        return x == other.x && y == other.y;
+    }
+
+#ifdef NBIND
+
     unsigned getX(void) const
     {
         return x;
@@ -33,13 +42,6 @@ struct Position {
     {
         return y;
     }
-
-    bool operator==(Position const & other) const
-    {
-        return x == other.x && y == other.y;
-    }
-
-#ifdef NBIND
 
     void toJS(nbind::cbOutput output) const
     {
@@ -52,8 +54,6 @@ struct Position {
 
 
 #ifdef DEBUG
-
-#include <iostream>
 
 inline static std::ostream & operator <<(std::ostream & os, Position const & position)
 {

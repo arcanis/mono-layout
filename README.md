@@ -16,6 +16,11 @@
   - Shipped as NPM module (w/ an asmjs fallback for browsers)
   - Also available as a zero-dependencies C++ library
 
+Currently not implemented:
+
+  - Font width support
+  - Unicode support
+
 ## Installation
 
 ```

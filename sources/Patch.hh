@@ -1,7 +1,12 @@
 #pragma once
 
-#include <string>
 #include <vector>
+
+#ifdef NBIND
+# include <string>
+#endif
+
+#include "./Line.hh"
 
 struct Patch {
 
@@ -12,7 +17,12 @@ struct Patch {
     unsigned deletedLineCount;
 
     // The vector of generated lines
-    std::vector<std::string> addedLines;
+    std::vector<Line> addedLines;
+
+    // The vector of generated line strings
+    std::vector<std::string> addedLineStrings;
+
+#ifdef NBIND
 
     unsigned getStartingRow(void) const
     {
@@ -26,7 +36,9 @@ struct Patch {
 
     std::vector<std::string> getAddedLines(void) const
     {
-        return addedLines;
+        return addedLineStrings;
     }
+
+#endif
 
 };
