@@ -34,15 +34,15 @@ class TextLayout {
 
  public: // options setters
 
-    void setColumns(unsigned columns);
-    void setTabWidth(unsigned tabWidth);
+    bool setColumns(unsigned columns);
+    bool setTabWidth(unsigned tabWidth);
 
-    void setCollapseWhitespaces(bool collapseWhitespaces);
-    void setPreserveLeadingSpaces(bool preserveLeadingSpaces);
-    void setPreserveTrailingSpaces(bool preserveTrailingSpaces);
-    void setAllowWordBreaks(bool allowWordBreaks);
-    void setDemoteNewlines(bool demoteNewlines);
-    void setJustifyText(bool justifyText);
+    bool setCollapseWhitespaces(bool collapseWhitespaces);
+    bool setPreserveLeadingSpaces(bool preserveLeadingSpaces);
+    bool setPreserveTrailingSpaces(bool preserveTrailingSpaces);
+    bool setAllowWordBreaks(bool allowWordBreaks);
+    bool setDemoteNewlines(bool demoteNewlines);
+    bool setJustifyText(bool justifyText);
 
  public: // interfacing callbacks
 

@@ -71,44 +71,87 @@ bool TextLayout::getJustifyText(void) const
     return m_justifyText;
 }
 
-void TextLayout::setColumns(unsigned columns)
+bool TextLayout::setColumns(unsigned columns)
 {
+    if (m_columns == columns)
+        return false;
+
     m_columns = columns;
+
+    if (this->getSoftWrapCount() == 0 && columns >= this->getColumnCount())
+        return false;
+
+    return true;
 }
 
-void TextLayout::setTabWidth(unsigned tabWidth)
+bool TextLayout::setTabWidth(unsigned tabWidth)
 {
+    if (m_tabWidth == tabWidth)
+        return false;
+
     m_tabWidth = tabWidth;
+
+    return true;
 }
 
-void TextLayout::setCollapseWhitespaces(bool collapseWhitespaces)
+bool TextLayout::setCollapseWhitespaces(bool collapseWhitespaces)
 {
+    if (m_collapseWhitespaces == collapseWhitespaces)
+        return false;
+
     m_collapseWhitespaces = collapseWhitespaces;
+
+    return true;
 }
 
-void TextLayout::setPreserveLeadingSpaces(bool preserveLeadingSpaces)
+bool TextLayout::setPreserveLeadingSpaces(bool preserveLeadingSpaces)
 {
+    if (m_preserveLeadingSpaces == preserveLeadingSpaces)
+        return false;
+
     m_preserveLeadingSpaces = preserveLeadingSpaces;
+
+    return true;
 }
 
-void TextLayout::setPreserveTrailingSpaces(bool preserveTrailingSpaces)
+bool TextLayout::setPreserveTrailingSpaces(bool preserveTrailingSpaces)
 {
+    if (m_preserveTrailingSpaces == preserveTrailingSpaces)
+        return false;
+
     m_preserveTrailingSpaces = preserveTrailingSpaces;
+
+    return true;
 }
 
-void TextLayout::setAllowWordBreaks(bool allowWordBreaks)
+bool TextLayout::setAllowWordBreaks(bool allowWordBreaks)
 {
+    if (m_allowWordBreaks == allowWordBreaks)
+        return false;
+
     m_allowWordBreaks = allowWordBreaks;
+
+    return true;
 }
 
-void TextLayout::setDemoteNewlines(bool demoteNewlines)
+bool TextLayout::setDemoteNewlines(bool demoteNewlines)
 {
+    if (m_demoteNewlines == demoteNewlines)
+        return false;
+
     m_demoteNewlines = demoteNewlines;
+
+    return true;
 }
 
-void TextLayout::setJustifyText(bool justifyText)
+bool TextLayout::setJustifyText(bool justifyText)
 {
+    if (m_justifyText == justifyText)
+        return false;
+
     m_justifyText = justifyText;
+
+    return true;
 }
 
 #ifndef NBIND
