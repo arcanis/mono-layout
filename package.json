@@ -1,44 +1,31 @@
 {
-    "name": "@manaflair/text-layout",
-    "version": "0.3.0",
-    "license": "MIT",
-
-    "main": "./sources/entry-node",
-    "browser": "./sources/entry-browser",
-
-    "scripts": {
-
-        "autogypi": "autogypi",
-        "node-gyp": "node-gyp",
-        "emcc-path": "emcc-path",
-
-        "build:native": "npm run node-gyp configure build",
-        "build:asmjs": "npm run node-gyp configure build --asmjs=1",
-        "build:all": "npm run build:native && npm run build:asmjs",
-        "build": "npm run build:all",
-
-        "test:native": "time node sources/run-tests node",
-        "test:asmjs": "time node sources/run-tests browser",
-        "test:all": "npm run test:native && npm run test:asmjs",
-        "test": "npm run test:all",
-
-        "install": "npm run autogypi && npm run build:native",
-        "prepublish": "npm run build:asmjs && test -f build/Release/nbind.js"
-
-    },
-
-    "dependencies": {
-
-        "autogypi": "^0.2.2",
-        "nbind": "^0.3.6",
-        "node-gyp": "^3.4.0"
-
-    },
-
-    "devDependencies": {
-
-        "@manaflair/term-strings": "^0.3.0",
-        "glob": "^7.1.1"
-
-    }
+  "name": "@manaflair/text-layout",
+  "version": "0.4.0",
+  "license": "MIT",
+  "main": "./sources/entry-node",
+  "browser": "./sources/entry-browser",
+  "scripts": {
+    "autogypi": "autogypi",
+    "node-gyp": "node-gyp",
+    "emcc-path": "emcc-path",
+    "build:native": "npm run node-gyp configure build",
+    "build:asmjs": "npm run node-gyp configure build --asmjs=1",
+    "build:all": "npm run build:native && npm run build:asmjs",
+    "build": "npm run build:all",
+    "test:native": "time node sources/run-tests node",
+    "test:asmjs": "time node sources/run-tests browser",
+    "test:all": "npm run test:native && npm run test:asmjs",
+    "test": "npm run test:all",
+    "install": "npm run autogypi && npm run build:native",
+    "prepublish": "npm run build:asmjs && test -f build/Release/nbind.js"
+  },
+  "dependencies": {
+    "autogypi": "^0.2.2",
+    "nbind": "^0.3.6",
+    "node-gyp": "^3.4.0"
+  },
+  "devDependencies": {
+    "@manaflair/term-strings": "^0.3.0",
+    "glob": "^7.1.1"
+  }
 }
