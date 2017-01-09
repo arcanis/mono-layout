@@ -33,19 +33,9 @@ struct Position {
 
 #ifdef NBIND
 
-    unsigned getX(void) const
+    void toJS(nbind::cbOutput expose) const
     {
-        return x;
-    }
-
-    unsigned getY(void) const
-    {
-        return y;
-    }
-
-    void toJS(nbind::cbOutput output) const
-    {
-        output(x, y);
+        expose(x, y);
     }
 
 #endif

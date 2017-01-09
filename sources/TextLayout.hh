@@ -53,8 +53,8 @@ class TextLayout {
 
 #else
 
-    void setCharacterGetter(nbind::cbFunction & m_getCharacter);
-    void setCharacterCountGetter(nbind::cbFunction & m_getCharacterCount);
+    void setCharacterGetter(nbind::cbFunction & getCharacter);
+    void setCharacterCountGetter(nbind::cbFunction & getCharacterCount);
 
 #endif
 

@@ -1,55 +1,92 @@
 module.exports = function (bind, lib) {
 
-    function patch(className, methodName, replacement) {
+    class Patch {
 
-        let original = lib[className].prototype[methodName];
+        constructor(startingRow, deletedLineCount, addedLineStrings) {
 
-        lib[className].prototype[methodName] = function (... args) {
-            return replacement.apply(this, [ this, original, ... args ]);
-        };
+            this.startingRow = startingRow;
+            this.deletedLineCount = deletedLineCount;
+            this.addedLineStrings = addedLineStrings;
+
+        }
+
+        apply(targetArray) {
+
+            targetArray.splice(this.startingRow, this.deletedLineCount, ... this.addedLineStrings);
+
+        }
+
+        toString() {
+
+            return `<Patch#+${this.addedLineStrings.length}-${this.deletedLineCount}@${this.startingRow}>`;
+
+        }
 
     }
 
-    var Position = function (x, y) {
-        Object.assign(this, { x, y });
-    };
+    class Position {
 
-    Position.prototype.fromJS = function (output) {
-        output(this.x, this.y);
-    };
+        constructor(x, y) {
 
-    Position.prototype.toString = function () {
-        return `<Position#${this.x}:${this.y}>`;
-    };
+            this.x = x;
+            this.y = y;
 
+        }
+
+        fromJS(expose) {
+
+            expose(this.x, this.y);
+
+        }
+
+        toString() {
+
+            return `<Position#${this.x}:${this.y}>`;
+
+        }
+
+    }
+
+    class TextLayout extends lib.TextLayout {
+
+        setColumns(columns) {
+
+            return super.setColumns(Math.min(columns, 0xFFFFFFFF));
+
+        }
+
+        getPositionAbove(position, amplitude = 1) {
+
+            return super.getPositionAbove(position, amplitude);
+
+        }
+
+        getPositionBelow(position, amplitude = 1) {
+
+            return super.getPositionBelow(position, amplitude);
+
+        }
+
+        setOptions(options) {
+
+            return Object.keys(options).reduce((needsReset, optionName) => {
+
+                let methodName = `set${optionName[0].toUpperCase()}${optionName.substr(1)}`;
+
+                if (!this[methodName])
+                    throw new Error(`Invalid option "${optionName}"`);
+
+                return this[methodName](options[optionName]) || needsReset;
+
+            }, false);
+
+        }
+
+    }
+
+    bind(`Patch`, Patch);
     bind(`Position`, Position);
 
-    patch(`TextLayout`, `setColumns`, (self, original, columns) => original.call(self, Math.min(columns, 0xFFFFFFFF)));
-    patch(`TextLayout`, `getPositionAbove`, (self, original, position, amplitude = 1) => original.call(self, position, amplitude));
-    patch(`TextLayout`, `getPositionBelow`, (self, original, position, amplitude = 1) => original.call(self, position, amplitude));
-
-    lib.TextLayout.prototype.setOptions = function (options) {
-
-        let needReset = false;
-        let optionNames = Object.keys(options);
-
-        for (let optionName of optionNames) {
-
-            let methodName = `set${optionName[0].toUpperCase()}${optionName.substr(1)}`;
-
-            if (!this[methodName])
-                throw new Error(`Invalid option "${optionName}"`);
-
-            needReset = this[methodName](options[optionName]) || needReset;
-
-        }
-
-        if (needReset) {
-            this.reset();
-        }
-
-    };
-
-    return { Position, TextLayout: lib.TextLayout };
+    return { Patch, Position, TextLayout };
 
 };

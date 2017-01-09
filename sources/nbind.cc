@@ -7,19 +7,12 @@
 NBIND_CLASS(Patch)
 {
     construct<>();
-
-    getter(getStartingRow);
-    getter(getDeletedLineCount);
-    getter(getAddedLines);
 }
 
 NBIND_CLASS(Position)
 {
     construct<>();
     construct<unsigned, unsigned>();
-
-    getter(getX);
-    getter(getY);
 }
 
 NBIND_CLASS(TextLayout)

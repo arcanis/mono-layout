@@ -1,9 +1,11 @@
 #pragma once
 
+#include <string>
 #include <vector>
 
 #ifdef NBIND
-# include <string>
+# include <nbind/api.h>
+# include <nbind/BindDefiner.h>
 #endif
 
 #include "./Line.hh"
@@ -24,19 +26,9 @@ struct Patch {
 
 #ifdef NBIND
 
-    unsigned getStartingRow(void) const
+    void toJS(nbind::cbOutput expose) const
     {
-        return startingRow;
-    }
-
-    unsigned getDeletedLineCount(void) const
-    {
-        return deletedLineCount;
-    }
-
-    std::vector<std::string> getAddedLines(void) const
-    {
-        return addedLineStrings;
+        expose(startingRow, deletedLineCount, addedLineStrings);
     }
 
 #endif

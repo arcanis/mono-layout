@@ -40,7 +40,7 @@ class TestSuite {
                 test.fn(testsuite, makeEnv());
                 console.log(`${indent} ${ok} ${test.label}`);
             } catch (err) {
-                console.log(`${indent} ${ko} ${test.label} (${err.message || err})`);
+                console.log(`${indent} ${ko} ${test.label} (${err.stack || err})`);
             }
 
             testsuite.run(level + 1);
@@ -67,7 +67,7 @@ function makeEnv() {
 
     function APPLY(patch) {
 
-        otp.splice(patch.startingRow, patch.deletedLineCount, ... patch.addedLines);
+        patch.apply(otp);
 
     }
 
