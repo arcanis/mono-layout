@@ -6,6 +6,10 @@
 #include "./../tools/TextProvider.hh"
 #include "./../TextLayout.hh"
 
+#define SETUP_EMPTY()                                                   \
+                                                                        \
+    TextLayout layout = TextLayout();                                   \
+
 #define SETUP(STR)                                                      \
                                                                         \
     TextLayout layout = TextLayout();                                   \
@@ -15,7 +19,7 @@
     layout.setCharacterCountGetter(provider.getCharacterCountGetter()); \
                                                                         \
     TextOutput output = TextOutput();                                   \
-    output.apply(layout.reset());
+    output.apply(layout.reset());                                       \
 
 #define SPLICE(OFFSET, LENGTH, REPLACEMENT)                          \
 {                                                                    \
@@ -28,28 +32,28 @@
                                                                      \
     provider.update(offset, length, replacement);                    \
     output.apply(layout.update(offset, length, replacement.size())); \
-}
+}                                                                    \
 
 #define APPEND(STRING)                               \
 {                                                    \
     SPLICE(provider.getCharacterCount(), 0, STRING); \
-}
+}                                                    \
 
 #define RESET()                   \
 {                                 \
     output.apply(layout.reset()); \
-}
+}                                 \
 
 #define TEXT()        \
 ({                    \
     output.getText(); \
-})
+})                    \
 
 #define LINE_COUNT()       \
 ({                         \
     output.getLineCount(); \
-})
+})                         \
 
 #define FOR(C, STR)                 \
                                     \
-    for (auto c : std::string(STR))
+    for (auto c : std::string(STR)) \

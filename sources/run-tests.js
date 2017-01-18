@@ -57,13 +57,10 @@ class TestSuite {
 
 function makeEnv() {
 
-    let str = '';
-    let otp = [ '' ];
-
     let layout = new bindings.TextLayout();
 
-    layout.setCharacterGetter(offset => str.charCodeAt(offset));
-    layout.setCharacterCountGetter(() => str.length);
+    let str = '';
+    let otp = [ '' ];
 
     function APPLY(patch) {
 
@@ -71,9 +68,17 @@ function makeEnv() {
 
     }
 
+    function SETUP_EMPTY() {
+
+    }
+
     function SETUP(newStr) {
 
+        layout.setCharacterGetter(offset => str.charCodeAt(offset));
+        layout.setCharacterCountGetter(() => str.length);
+
         str = newStr;
+
         APPLY(layout.reset());
 
     }
@@ -117,7 +122,7 @@ function makeEnv() {
 
     }
 
-    return { layout, SETUP, RESET, SPLICE, APPEND, LINE_COUNT, TEXT, REQUIRE, Position: (x, y) => new bindings.Position(x, y) };
+    return { layout, SETUP_EMPTY, SETUP, RESET, SPLICE, APPEND, LINE_COUNT, TEXT, REQUIRE, Position: (x, y) => new bindings.Position(x, y) };
 
 }
 

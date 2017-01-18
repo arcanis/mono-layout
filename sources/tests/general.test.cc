@@ -45,6 +45,7 @@ TEST_CASE("it should correctly wrap text")
     SETUP("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
     layout.setColumns(4);
+    layout.setSoftWrap(true);
     RESET();
 
     REQUIRE(LINE_COUNT() == 7);
@@ -56,6 +57,7 @@ TEST_CASE("it should avoid breaking words unless allowed to")
     SETUP("Horse Tiger Snake Zebra Mouse Sheep Whale Panda");
 
     layout.setColumns(8);
+    layout.setSoftWrap(true);
     RESET();
 
     REQUIRE(LINE_COUNT() == 8);
@@ -83,6 +85,7 @@ TEST_CASE("it should justify the text if requested")
     SETUP("Horse Tiger Snake Zebra Mouse Sheep Whale Panda");
 
     layout.setColumns(14);
+    layout.setSoftWrap(true);
     layout.setCollapseWhitespaces(true);
     layout.setJustifyText(true);
     RESET();

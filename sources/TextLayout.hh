@@ -25,6 +25,7 @@ class TextLayout {
     unsigned getColumns(void) const;
     unsigned getTabWidth(void) const;
 
+    bool getSoftWrap(void) const;
     bool getCollapseWhitespaces(void) const;
     bool getPreserveLeadingSpaces(void) const;
     bool getPreserveTrailingSpaces(void) const;
@@ -37,6 +38,7 @@ class TextLayout {
     bool setColumns(unsigned columns);
     bool setTabWidth(unsigned tabWidth);
 
+    bool setSoftWrap(bool softWrap);
     bool setCollapseWhitespaces(bool collapseWhitespaces);
     bool setPreserveLeadingSpaces(bool preserveLeadingSpaces);
     bool setPreserveTrailingSpaces(bool preserveTrailingSpaces);
@@ -109,6 +111,7 @@ class TextLayout {
     unsigned m_columns;
     unsigned m_tabWidth;
 
+    bool m_softWrap;
     bool m_collapseWhitespaces;
     bool m_preserveLeadingSpaces;
     bool m_preserveTrailingSpaces;

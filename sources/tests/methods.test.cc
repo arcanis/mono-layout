@@ -151,6 +151,7 @@ TEST_CASE("#getRowCount()")
         SETUP("Horse Tiger Snake Zebra Mouse Sheep Whale Panda");
 
         layout.setColumns(8);
+        layout.setSoftWrap(true);
         RESET();
 
         REQUIRE(layout.getRowCount() == 8);
@@ -159,11 +160,45 @@ TEST_CASE("#getRowCount()")
 
 TEST_CASE("#getColumnCount()")
 {
+    SECTION("it should return 0 on an uninitialized buffer")
+    {
+        SETUP_EMPTY();
+
+        REQUIRE(layout.getColumnCount() == 0);
+    }
+
     SECTION("it should return the maximal number of columns in the document")
     {
         SETUP("This is a test\nHello World\nSanctus Dominus Infernus\n");
 
         REQUIRE(layout.getColumnCount() == 24);
+    }
+
+    SECTION("it should be correctly set when the layout has a maximal number of column lower than needed")
+    {
+        SETUP("Horse Tiger Snake Zebra Mouse Sheep Whale Panda");
+
+        layout.setColumns(8);
+        layout.setSoftWrap(true);
+        RESET();
+
+        REQUIRE(layout.getColumnCount() == 5);
+    }
+
+    SECTION("it should be correctly updated when the layout options are updated")
+    {
+        SETUP("Horse Tiger Snake Zebra Mouse Sheep Whale Panda");
+
+        layout.setColumns(8);
+        layout.setSoftWrap(true);
+        RESET();
+
+        REQUIRE(layout.getColumnCount() == 5);
+
+        layout.setAllowWordBreaks(true);
+        RESET();
+
+        REQUIRE(layout.getColumnCount() == 8);
     }
 
     SECTION("it should be correctly updated when lines are removed")
@@ -210,6 +245,7 @@ TEST_CASE("#getSoftWrapCount()")
         SETUP("Horse Tiger Snake Zebra Mouse Sheep Whale Panda");
 
         layout.setColumns(8);
+        layout.setSoftWrap(true);
         RESET();
 
         REQUIRE(layout.getSoftWrapCount() == 7);
@@ -220,6 +256,7 @@ TEST_CASE("#getSoftWrapCount()")
         SETUP("Horse Tiger Snake Zebra Mouse Sheep Whale Panda");
 
         layout.setColumns(5);
+        layout.setSoftWrap(true);
         RESET();
 
         REQUIRE(layout.getSoftWrapCount() == 7);

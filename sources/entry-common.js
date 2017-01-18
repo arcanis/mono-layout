@@ -1,5 +1,23 @@
 module.exports = function (bind, lib) {
 
+    function toPosition(position) {
+
+        if (position instanceof Position)
+            return position;
+
+        return new Position(position.x, position.y);
+
+    }
+
+    function toChar(c) {
+
+        if (typeof c === `string`)
+            c = c.codePointAt(0);
+
+        return c;
+
+    }
+
     class Patch {
 
         constructor(startingRow, deletedLineCount, addedLineStrings) {
@@ -49,21 +67,54 @@ module.exports = function (bind, lib) {
 
     class TextLayout extends lib.TextLayout {
 
+        setCharacterGetter(fn) {
+
+            if (typeof fn === `function`)
+                fn = (orig => (... args) => toChar(orig(... args)))(fn);
+
+            return super.setCharacterGetter(fn);
+
+        }
+
         setColumns(columns) {
 
             return super.setColumns(Math.min(columns, 0xFFFFFFFF));
 
         }
 
+        getFixedPosition(position) {
+
+            return super.getFixedPosition(toPosition(position));
+
+        }
+
+        getPositionLeft(position) {
+
+            return super.getPositionLeft(toPosition(position));
+
+        }
+
+        getPositionRight(position) {
+
+            return super.getPositionRight(toPosition(position));
+
+        }
+
         getPositionAbove(position, amplitude = 1) {
 
-            return super.getPositionAbove(position, amplitude);
+            return super.getPositionAbove(toPosition(position), amplitude);
 
         }
 
         getPositionBelow(position, amplitude = 1) {
 
-            return super.getPositionBelow(position, amplitude);
+            return super.getPositionBelow(toPosition(position), amplitude);
+
+        }
+
+        getCharacterIndexForPosition(position) {
+
+            return super.getCharacterIndexForPosition(toPosition(position));
 
         }
 

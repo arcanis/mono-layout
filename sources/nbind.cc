@@ -19,8 +19,19 @@ NBIND_CLASS(TextLayout)
 {
     construct<>();
 
+    method(getColumns);
+    method(getTabWidth);
+    method(getSoftWrap);
+    method(getCollapseWhitespaces);
+    method(getPreserveLeadingSpaces);
+    method(getPreserveTrailingSpaces);
+    method(getAllowWordBreaks);
+    method(getDemoteNewlines);
+    method(getJustifyText);
+
     method(setColumns);
     method(setTabWidth);
+    method(setSoftWrap);
     method(setCollapseWhitespaces);
     method(setPreserveLeadingSpaces);
     method(setPreserveTrailingSpaces);

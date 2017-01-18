@@ -29,6 +29,7 @@ TEST_CASE("stress test #3")
     SETUP("");
 
     layout.setColumns(10);
+    layout.setSoftWrap(true);
     layout.setCollapseWhitespaces(true);
     layout.setJustifyText(true);
     RESET();
@@ -47,6 +48,7 @@ TEST_CASE("stress test #4")
     SETUP("");
 
     layout.setColumns(10);
+    layout.setSoftWrap(true);
     layout.setCollapseWhitespaces(true);
     layout.setPreserveTrailingSpaces(true);
     layout.setJustifyText(true);

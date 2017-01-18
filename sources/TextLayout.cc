@@ -17,6 +17,7 @@
 TextLayout::TextLayout(void)
 : m_columns(static_cast<unsigned>(-1))
 , m_tabWidth(4)
+, m_softWrap(false)
 , m_collapseWhitespaces(false)
 , m_preserveLeadingSpaces(false)
 , m_preserveTrailingSpaces(false)
@@ -39,6 +40,11 @@ unsigned TextLayout::getColumns(void) const
 unsigned TextLayout::getTabWidth(void) const
 {
     return m_tabWidth;
+}
+
+bool TextLayout::getSoftWrap(void) const
+{
+    return m_softWrap;
 }
 
 bool TextLayout::getCollapseWhitespaces(void) const
@@ -78,7 +84,10 @@ bool TextLayout::setColumns(unsigned columns)
 
     m_columns = columns;
 
-    if (this->getSoftWrapCount() == 0 && columns >= this->getColumnCount())
+    if (!this->getSoftWrap())
+        return false;
+
+    if (this->getSoftWrapCount() == 0 && m_columns >= this->getColumnCount())
         return false;
 
     return true;
@@ -92,6 +101,21 @@ bool TextLayout::setTabWidth(unsigned tabWidth)
     m_tabWidth = tabWidth;
 
     return true;
+}
+
+bool TextLayout::setSoftWrap(bool softWrap)
+{
+    if (m_softWrap == softWrap)
+        return false;
+
+    m_softWrap = softWrap;
+
+    if (m_softWrap) {
+        return this->getSoftWrapCount() == 0;
+    } else {
+        return this->getColumnCount() < this->getColumns();
+    }
+
 }
 
 bool TextLayout::setCollapseWhitespaces(bool collapseWhitespaces)
@@ -554,19 +578,13 @@ Patch TextLayout::reset(void)
 {
     assert(m_lines.size() > 0);
 
-    auto deletedLineCount = m_lines.size();
-    m_lines = { Line() };
-
 #ifndef NBIND
     auto characterCount = m_getCharacterCount();
 #else
     auto characterCount = m_getCharacterCount->call<unsigned>();
 #endif
 
-    Patch patch = this->update(0, m_lines.back().inputOffset + m_lines.back().inputLength, characterCount);
-    patch.deletedLineCount = deletedLineCount;
-
-    return patch;
+    return this->update(0, m_lines.back().inputOffset + m_lines.back().inputLength, characterCount);
 }
 
 Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
@@ -603,6 +621,12 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
     // Create a structure that we will use to return a proper layout update (startingRow, removedLineCount & addedLines)
     Patch patch;
 
+    // We only care about the number of columns if the soft wrap feature is enabled
+    auto effectiveColumns = m_softWrap ? m_columns : std::numeric_limits<unsigned>::max();
+
+    // We only allow soft wrapping if the soft wrap feature is also enabled
+    auto effectiveJustifyText = m_softWrap && m_justifyText;
+
     // Compute the rows that surround the removed line segment
     auto rowStart = this->getRowForCharacterIndex(start);
     auto rowEnd = this->getRowForCharacterIndex(start + removed) + 1;
@@ -625,7 +649,7 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
     patch.deletedLineCount = rowEnd - rowStart;
 
     // Check that the configuration isn't weird, and then start looping over each character
-    if (m_columns > 0) while (offset < offsetEnd) {
+    if (effectiveColumns > 0) while (offset < offsetEnd) {
 
         // Create a new line that will then be populated with new tokens
         Line currentLine = Line();
@@ -664,7 +688,7 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
         // Iterate to find enough tokens to fill the line (until the requested number of columns is reached, or until the next \n, whatever happens first)
         while (!IS_END_OF_LINE()) {
 
-            if (currentLine.outputLength < m_columns && IS_WHITESPACE()) {
+            if (currentLine.outputLength < effectiveColumns && IS_WHITESPACE()) {
 
                 // Add a single space character when collapsing spaces
                 if (m_collapseWhitespaces) {
@@ -689,7 +713,7 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
                     Token token = NEW_TOKEN(TOKEN_WHITESPACES);
                     token.canBeSubdivided = true;
 
-                    for (auto c : SHIFT_WHITESPACES_UNTIL(m_columns - currentLine.outputLength)) switch (c) {
+                    for (auto c : SHIFT_WHITESPACES_UNTIL(effectiveColumns - currentLine.outputLength)) switch (c) {
 
                         case '\r':
                         case '\n':
@@ -737,11 +761,11 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
 
                 }
 
-                assert(currentLine.outputLength <= m_columns);
+                assert(currentLine.outputLength <= effectiveColumns);
 
             } // end of IS_WHITESPACE check
 
-            if (currentLine.outputLength < m_columns && IS_WORD()) {
+            if (currentLine.outputLength < effectiveColumns && IS_WORD()) {
 
                 if (m_allowWordBreaks) {
 
@@ -752,7 +776,7 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
                     token.inputOffset = currentLine.inputLength;
                     token.outputOffset = currentLine.outputLength;
 
-                    token.string = SHIFT_WORD_UNTIL(m_columns - currentLine.outputLength);
+                    token.string = SHIFT_WORD_UNTIL(effectiveColumns - currentLine.outputLength);
 
                     token.inputLength = offset - token.inputOffset - currentLine.inputOffset;
                     token.outputLength = token.string.size();
@@ -768,7 +792,7 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
                     token.inputOffset = currentLine.inputLength;
                     token.outputOffset = currentLine.outputLength;
 
-                    token.string = SHIFT_WORD_UNTIL(m_columns - currentLine.outputLength);
+                    token.string = SHIFT_WORD_UNTIL(effectiveColumns - currentLine.outputLength);
 
                     if (!IS_WORD() || currentLine.outputLength == 0) {
 
@@ -788,11 +812,11 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
 
                 }
 
-                assert(currentLine.outputLength <= m_columns);
+                assert(currentLine.outputLength <= effectiveColumns);
 
             } // end of IS_WORD check
 
-            if (currentLine.outputLength == m_columns) {
+            if (currentLine.outputLength == effectiveColumns) {
                 break;
             }
 
@@ -808,7 +832,7 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
             SHIFT_CHARACTER();
 
         // if we don't care about trailing and/or if we need to collapse our whitespaces and we're on a soft-wrapping line
-        if (!m_preserveTrailingSpaces || ((m_collapseWhitespaces || m_justifyText) && currentLine.doesSoftWrap && !IS_END_OF_FILE())) {
+        if (!m_preserveTrailingSpaces || ((m_collapseWhitespaces || effectiveJustifyText) && currentLine.doesSoftWrap && !IS_END_OF_FILE())) {
 
             auto tokenIterator = currentLine.tokens.rbegin();
 
@@ -847,13 +871,13 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
         }
 
         // Try to justify the line if needed and requested, except on the last soft-line of the hard-line, if that makes sense
-        if (m_justifyText && !IS_END_OF_LINE() && currentLine.outputLength < m_columns) {
+        if (effectiveJustifyText && !IS_END_OF_LINE() && currentLine.outputLength < effectiveColumns) {
 
             // Hold the number of spaces we've added so far
             auto extraSpaceCount = 0u;
 
             // Hold the number of spaces that we still need to add
-            auto missingSpaceCount = m_columns - currentLine.outputLength;
+            auto missingSpaceCount = effectiveColumns - currentLine.outputLength;
 
             // Hold the number of slots where we can actually fit those extra spaces
             auto availableSlotCount = static_cast<unsigned>(std::count_if(currentLine.tokens.begin(), currentLine.tokens.end(), [](auto const & token) {

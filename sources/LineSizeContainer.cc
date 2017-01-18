@@ -1,7 +1,7 @@
 #include "./LineSizeContainer.hh"
 
 LineSizeContainer::LineSizeContainer(void)
-: m_container{}
+: m_container {{ 0, 1 }}
 {
 }
 
