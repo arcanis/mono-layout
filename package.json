@@ -17,7 +17,7 @@
     "test:browser": "time node sources/run-tests browser",
     "test:all": "npm run test:node && npm run test:browser",
     "test": "npm run test:all",
-    "postinstall": "npm run autogypi && npm run build:node && npm run build:browser:maybe",
+    "install": "npm run autogypi && npm run build:node && npm run build:browser:maybe",
     "prepublish": "test -f build/Release/nbind.js"
   },
   "dependencies": {
