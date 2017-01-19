@@ -1,7 +1,6 @@
 #include <cassert>
 
 #include <algorithm>
-#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -85,10 +84,13 @@ bool TextLayout::setColumns(unsigned columns)
 
     m_columns = columns;
 
-    if (!this->getSoftWrap())
+    // When soft wrapping isn't enabled, changing the max number of columns doesn't change anything
+    if (!m_softWrap)
         return false;
 
-    if (this->getSoftWrapCount() == 0 && m_columns >= this->getColumnCount())
+    // When soft wrapping is enabled but the number of columns is lower or equal to the new number of columns, we don't have to reset the layout if none of the lines are soft-wrapping
+    // Note that we also need to check to make sure that getColumnCount() is higher than zero, because it's a special case that can be reached if the previous maximal number of columns is 0
+    if (this->getColumnCount() > 0 && this->getColumnCount() <= m_columns && this->getSoftWrapCount() == 0)
         return false;
 
     return true;
@@ -111,11 +113,12 @@ bool TextLayout::setSoftWrap(bool softWrap)
 
     m_softWrap = softWrap;
 
-    if (m_softWrap) {
-        return this->getSoftWrapCount() == 0;
-    } else {
-        return this->getColumnCount() < this->getColumns();
-    }
+    // We don't need to reset the layout if the maximal number of row is higher than the current number of columns
+    // We also check that the number of soft wrap is 0, but that's not strictly required since we will only reach this code path when switching from wrap=off to wrap=on, in which case the soft wrap count will always be 0
+    if (this->getColumnCount() <= m_columns && this->getSoftWrapCount() == 0)
+        return false;
+
+    return true;
 
 }
 
@@ -650,7 +653,12 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
     patch.deletedLineCount = rowEnd - rowStart;
 
     // Check that the configuration isn't weird, and then start looping over each character
-    if (effectiveColumns > 0) while (offset < offsetEnd) {
+    if (effectiveColumns == 0) {
+
+        patch.addedLines.push_back(Line{ Token(TOKEN_DYNAMIC) });
+        patch.addedLineStrings.push_back("");
+
+    } else while (offset < offsetEnd) {
 
         // Create a new line that will then be populated with new tokens
         Line currentLine = Line();
