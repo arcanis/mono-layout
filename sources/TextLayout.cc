@@ -30,6 +30,7 @@ TextLayout::TextLayout(void)
 , m_softWrapCount(0)
 , m_lines{ Line{ Token(TOKEN_DYNAMIC) } }
 {
+    assert(m_lines.size() > 0);
 }
 
 unsigned TextLayout::getColumns(void) const
@@ -245,7 +246,7 @@ Position TextLayout::getFixedPosition(Position position) const
     assert(m_lines.size() > 0);
 
     position.y = std::min(position.y, static_cast<unsigned>(m_lines.size() - 1));
-    position.x = std::min(position.x, m_lines.at(position.x).outputLength);
+    position.x = std::min(position.x, m_lines.at(position.y).outputLength);
 
     auto const & line = m_lines.at(position.y);
 
@@ -958,6 +959,8 @@ void TextLayout::apply(Patch const & patch)
 
     m_lines.erase(m_lines.begin() + patch.startingRow, m_lines.begin() + patch.startingRow + patch.deletedLineCount);
     m_lines.insert(m_lines.begin() + patch.startingRow, patch.addedLines.begin(), patch.addedLines.end());
+
+    assert(m_lines.size() > 0);
 
     for (unsigned t = 0u; t < patch.addedLines.size(); ++t) {
 
