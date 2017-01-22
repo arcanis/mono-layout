@@ -223,6 +223,32 @@ unsigned TextLayout::getSoftWrapCount(void) const
     return m_softWrapCount;
 }
 
+unsigned TextLayout::getMaxCharacterIndex(void) const
+{
+#ifndef NBIND
+    return m_getCharacterCount();
+#else
+    return m_getCharacterCount->call<unsigned>();
+#endif
+}
+
+Position TextLayout::getFirstPosition(void) const
+{
+    return Position(0, 0);
+}
+
+Position TextLayout::getLastPosition(void) const
+{
+    return Position(m_lines.back().outputLength, m_lines.size() - 1);
+}
+
+bool TextLayout::doesSoftWrap(unsigned row) const
+{
+    assert(row < m_lines.size());
+
+    return m_lines.at(row).doesSoftWrap;
+}
+
 TokenLocator TextLayout::findTokenLocatorForPosition(Position const & position) const
 {
     assert(position.y < m_lines.size());

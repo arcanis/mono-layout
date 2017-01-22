@@ -65,6 +65,12 @@ class TextLayout {
     unsigned getRowCount(void) const;
     unsigned getColumnCount(void) const;
     unsigned getSoftWrapCount(void) const;
+    unsigned getMaxCharacterIndex(void) const;
+
+    Position getFirstPosition(void) const;
+    Position getLastPosition(void) const;
+
+    bool doesSoftWrap(unsigned row) const;
 
  public: // cursor management
 

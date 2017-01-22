@@ -45,6 +45,10 @@ NBIND_CLASS(TextLayout)
     method(getRowCount);
     method(getColumnCount);
     method(getSoftWrapCount);
+    method(getMaxCharacterIndex);
+    method(getFirstPosition);
+    method(getLastPosition);
+    method(doesSoftWrap);
 
     method(getFixedPosition);
     method(getPositionLeft);
