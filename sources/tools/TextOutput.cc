@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-#include "./../Patch.hh"
+#include "./../TextOperation.hh"
 #include "./TextOutput.hh"
 
 TextOutput::TextOutput(void)
@@ -37,11 +37,11 @@ std::string TextOutput::getText(void) const
     return stream.str();
 }
 
-void TextOutput::apply(Patch const & patch)
+void TextOutput::apply(TextOperation const & textOperation)
 {
-    assert(patch.startingRow <= m_lines.size());
-    assert(patch.startingRow + patch.deletedLineCount <= m_lines.size());
+    assert(textOperation.startingRow <= m_lines.size());
+    assert(textOperation.startingRow + textOperation.deletedLineCount <= m_lines.size());
 
-    m_lines.erase(m_lines.begin() + patch.startingRow, m_lines.begin() + patch.startingRow + patch.deletedLineCount);
-    m_lines.insert(m_lines.begin() + patch.startingRow, patch.addedLineStrings.begin(), patch.addedLineStrings.end());
+    m_lines.erase(m_lines.begin() + textOperation.startingRow, m_lines.begin() + textOperation.startingRow + textOperation.deletedLineCount);
+    m_lines.insert(m_lines.begin() + textOperation.startingRow, textOperation.addedLineStrings.begin(), textOperation.addedLineStrings.end());
 }

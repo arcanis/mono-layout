@@ -10,7 +10,7 @@
 
 #include "./Line.hh"
 
-struct Patch {
+struct TextOperation {
 
     // The index of the line from which we need to start update
     unsigned startingRow;

@@ -49,7 +49,7 @@ TEST_CASE("it should correctly wrap text")
     RESET();
 
     REQUIRE(LINE_COUNT() == 7);
-    REQUIRE("ABCD\nEFGH\nIJKL\nMNOP\nQRST\nUVWX\nYZ");
+    REQUIRE(TEXT() == "ABCD\nEFGH\nIJKL\nMNOP\nQRST\nUVWX\nYZ");
 }
 
 TEST_CASE("it should avoid breaking words unless allowed to")

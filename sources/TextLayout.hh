@@ -10,8 +10,8 @@
 
 #include "./LineSizeContainer.hh"
 #include "./Line.hh"
-#include "./Patch.hh"
 #include "./Position.hh"
+#include "./TextOperation.hh"
 #include "./TokenLocator.hh"
 
 class TextLayout {
@@ -92,8 +92,8 @@ class TextLayout {
 
  public: // state mutators
 
-    Patch reset(void);
-    Patch update(unsigned start, unsigned deleted, unsigned added);
+    TextOperation reset(void);
+    TextOperation update(unsigned start, unsigned deleted, unsigned added);
 
 #ifdef DEBUG
 
@@ -106,7 +106,7 @@ class TextLayout {
 
  private:
 
-    void apply(Patch const & patch);
+    void apply(TextOperation const & textOperation);
 
  private:
 

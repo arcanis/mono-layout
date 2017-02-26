@@ -1,10 +1,10 @@
-#include "./Patch.hh"
 #include "./Position.hh"
 #include "./TextLayout.hh"
+#include "./TextOperation.hh"
 
 #include <nbind/nbind.h>
 
-NBIND_CLASS(Patch)
+NBIND_CLASS(TextOperation)
 {
     construct<>();
 }

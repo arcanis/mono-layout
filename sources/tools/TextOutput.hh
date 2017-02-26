@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "../Patch.hh"
+#include "../TextOperation.hh"
 
 class TextOutput {
 
@@ -23,7 +23,7 @@ class TextOutput {
 
  public:
 
-    void apply(Patch const & patch);
+    void apply(TextOperation const & textOperation);
 
  private:
 

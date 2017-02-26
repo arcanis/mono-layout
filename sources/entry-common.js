@@ -18,7 +18,7 @@ module.exports = function (bind, lib) {
 
     }
 
-    class Patch {
+    class TextOperation {
 
         constructor(startingRow, deletedLineCount, addedLineStrings) {
 
@@ -36,7 +36,7 @@ module.exports = function (bind, lib) {
 
         toString() {
 
-            return `<Patch#+${this.addedLineStrings.length}-${this.deletedLineCount}@${this.startingRow}>`;
+            return `<TextOperation#+${this.addedLineStrings.length}-${this.deletedLineCount}@${this.startingRow}>`;
 
         }
 
@@ -135,9 +135,9 @@ module.exports = function (bind, lib) {
 
     }
 
-    bind(`Patch`, Patch);
+    bind(`TextOperation`, TextOperation);
     bind(`Position`, Position);
 
-    return { Patch, Position, TextLayout };
+    return { TextOperation, Position, TextLayout };
 
 };

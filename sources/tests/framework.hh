@@ -56,4 +56,4 @@
 
 #define FOR(C, STR)                 \
                                     \
-    for (auto c : std::string(STR)) \
+    for (auto c : std::string(STR))

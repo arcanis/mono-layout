@@ -9,7 +9,7 @@ OBJ_TESTS	= $(TESTS:%.cc=%.o)
 DEPS		= $(SRC:%.cc=%.d) $(TESTS:%.cc=%.d)
 
 RM		= rm -f
-CXX		= clang++
+CXX		?= clang++
 
 CXXFLAGS	= -std=c++14 -W -Wall -Werror -MMD
 

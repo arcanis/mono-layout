@@ -9,8 +9,8 @@
 #endif
 
 #include "./Line.hh"
-#include "./Patch.hh"
 #include "./TextLayout.hh"
+#include "./TextOperation.hh"
 #include "./Token.hh"
 
 TextLayout::TextLayout(void)
@@ -604,7 +604,7 @@ unsigned TextLayout::getCharacterIndexForPosition(Position position) const
     }
 }
 
-Patch TextLayout::reset(void)
+TextOperation TextLayout::reset(void)
 {
     assert(m_lines.size() > 0);
 
@@ -617,7 +617,7 @@ Patch TextLayout::reset(void)
     return this->update(0, m_lines.back().inputOffset + m_lines.back().inputLength, characterCount);
 }
 
-Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
+TextOperation TextLayout::update(unsigned start, unsigned removed, unsigned added)
 {
 #ifndef NBIND
     #define GET_CHARACTER_COUNT() m_getCharacterCount()
@@ -649,7 +649,7 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
     #define PUSH_TOKEN(TOKEN) do { Token const & _token = (TOKEN); currentLine.tokens.push_back(_token); currentLine.inputLength += _token.inputLength; currentLine.outputLength += _token.outputLength; } while (0)
 
     // Create a structure that we will use to return a proper layout update (startingRow, removedLineCount & addedLines)
-    Patch patch;
+    TextOperation textOperation;
 
     // We only care about the number of columns if the soft wrap feature is enabled
     auto effectiveColumns = m_softWrap ? m_columns : std::numeric_limits<unsigned>::max();
@@ -673,16 +673,16 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
     auto offsetEnd = offsetMax + 1;
 
     // Compute the starting point of our modifications
-    patch.startingRow = rowStart;
+    textOperation.startingRow = rowStart;
 
     // Compute the number of rows that we know have been deleted (this number might be increased later if newly generated rows invalidate their successors)
-    patch.deletedLineCount = rowEnd - rowStart;
+    textOperation.deletedLineCount = rowEnd - rowStart;
 
     // Check that the configuration isn't weird, and then start looping over each character
     if (effectiveColumns == 0) {
 
-        patch.addedLines.push_back(Line{ Token(TOKEN_DYNAMIC) });
-        patch.addedLineStrings.push_back("");
+        textOperation.addedLines.push_back(Line{ Token(TOKEN_DYNAMIC) });
+        textOperation.addedLineStrings.push_back("");
 
     } else while (offset < offsetEnd) {
 
@@ -692,8 +692,8 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
         // Find its predecessor
         Line const * previousLine = nullptr;
 
-        if (patch.addedLines.size() > 0)
-            previousLine = &(patch.addedLines.back());
+        if (textOperation.addedLines.size() > 0)
+            previousLine = &(textOperation.addedLines.back());
         else if (rowStart > 0)
             previousLine = &(m_lines.at(rowStart - 1));
 
@@ -957,13 +957,13 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
         for (auto & token : currentLine.tokens)
             lineString += token.string;
 
-        patch.addedLines.push_back(currentLine);
-        patch.addedLineStrings.push_back(lineString);
+        textOperation.addedLines.push_back(currentLine);
+        textOperation.addedLineStrings.push_back(lineString);
 
-        while (rowStart + patch.deletedLineCount != m_lines.size() && m_lines.at(rowStart + patch.deletedLineCount).inputOffset + added < offset + removed)
-            patch.deletedLineCount += 1;
+        while (rowStart + textOperation.deletedLineCount != m_lines.size() && m_lines.at(rowStart + textOperation.deletedLineCount).inputOffset + added < offset + removed)
+            textOperation.deletedLineCount += 1;
 
-        if (rowStart + patch.deletedLineCount != m_lines.size() && m_lines.at(rowStart + patch.deletedLineCount).inputOffset + added == offset + removed)
+        if (rowStart + textOperation.deletedLineCount != m_lines.size() && m_lines.at(rowStart + textOperation.deletedLineCount).inputOffset + added == offset + removed)
             break;
 
         if (!hasNewline && IS_END_OF_FILE()) {
@@ -972,16 +972,16 @@ Patch TextLayout::update(unsigned start, unsigned removed, unsigned added)
 
     } // end of line loop
 
-    this->apply(patch);
+    this->apply(textOperation);
 
-    return patch;
+    return textOperation;
 }
 
-void TextLayout::apply(Patch const & patch)
+void TextLayout::apply(TextOperation const & textOperation)
 {
-    for (unsigned t = 0u; t < patch.deletedLineCount; ++t) {
+    for (unsigned t = 0u; t < textOperation.deletedLineCount; ++t) {
 
-        Line const & line = m_lines.at(patch.startingRow + t);
+        Line const & line = m_lines.at(textOperation.startingRow + t);
 
         m_lineSizeContainer.decrease(line.outputLength);
 
@@ -991,14 +991,14 @@ void TextLayout::apply(Patch const & patch)
 
     }
 
-    m_lines.erase(m_lines.begin() + patch.startingRow, m_lines.begin() + patch.startingRow + patch.deletedLineCount);
-    m_lines.insert(m_lines.begin() + patch.startingRow, patch.addedLines.begin(), patch.addedLines.end());
+    m_lines.erase(m_lines.begin() + textOperation.startingRow, m_lines.begin() + textOperation.startingRow + textOperation.deletedLineCount);
+    m_lines.insert(m_lines.begin() + textOperation.startingRow, textOperation.addedLines.begin(), textOperation.addedLines.end());
 
     assert(m_lines.size() > 0);
 
-    for (unsigned t = 0u; t < patch.addedLines.size(); ++t) {
+    for (unsigned t = 0u; t < textOperation.addedLines.size(); ++t) {
 
-        Line const & line = m_lines.at(patch.startingRow + t);
+        Line const & line = m_lines.at(textOperation.startingRow + t);
 
         m_lineSizeContainer.increase(line.outputLength);
 
@@ -1008,7 +1008,7 @@ void TextLayout::apply(Patch const & patch)
 
     }
 
-    for (unsigned t = std::max(1u, static_cast<unsigned>(patch.startingRow + patch.addedLines.size())); t < m_lines.size(); ++t) {
+    for (unsigned t = std::max(1u, static_cast<unsigned>(textOperation.startingRow + textOperation.addedLines.size())); t < m_lines.size(); ++t) {
         m_lines.at(t).inputOffset = m_lines.at(t - 1).inputOffset + m_lines.at(t - 1).inputLength;
         m_lines.at(t).outputOffset = m_lines.at(t - 1).outputOffset + m_lines.at(t - 1).outputLength;
     }
