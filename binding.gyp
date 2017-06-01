@@ -10,11 +10,7 @@
 	    "sources/nbind.cc",
             "sources/LineSizeContainer.cc",
 	    "sources/TextLayout.cc"
-	],
-
-        "cflags": [
-            "-DNBIND"
-        ]
+	]
 
     } ],
 

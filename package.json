@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "autogypi": "^0.2.2",
-    "nbind": "^0.3.9",
+    "nbind": "^0.3.12",
     "node-gyp": "^3.4.0"
   },
   "devDependencies": {

@@ -5,7 +5,8 @@
 
             "cflags_cc": [
                 "-std=c++14",
-                "-fvisibility=hidden"
+                "-fvisibility=hidden",
+                "-DNBIND"
             ],
 
             "ldflags": [
@@ -15,12 +16,11 @@
             "xcode_settings": {
                 "OTHER_CPLUSPLUSFLAGS": [
                     "-std=c++14",
-                    "-stdlib=libc++"
+                    "-stdlib=libc++",
+                    "-DNBIND"
                 ],
                 "OTHER_LDFLAGS": [
-                    "-stdlib=libc++",
-                    "-exported_symbols_list",
-                    "/dev/null"
+                    "-stdlib=libc++"
                 ],
                 "MACOSX_DEPLOYMENT_TARGET": "10.7"
             }
