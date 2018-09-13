@@ -18,6 +18,7 @@ struct Line {
     bool hasNewline;
 
     std::vector<Token> tokens;
+    std::string string;
 
     Line(void)
     : inputOffset(0)
@@ -27,6 +28,7 @@ struct Line {
     , doesSoftWrap(false)
     , hasNewline(false)
     , tokens{}
+    , string()
     {
     }
 
@@ -38,7 +40,11 @@ struct Line {
     , doesSoftWrap(false)
     , hasNewline(false)
     , tokens(tokens)
+    , string()
     {
+        for (auto const & token : tokens) {
+            this->string += token.string;
+        }
     }
 
 };

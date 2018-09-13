@@ -1,8 +1,11 @@
-  Module.applyPatch = (patch, targetArray) => {
+  Module.applyPatch = (textLayout, patch, targetArray) => {
+    if (!patch)
+      return;
+
     const strings = [];
 
-    for (let t = 0, T = patch.addedLineStrings.size(); t < T; ++t)
-      strings.push(patch.addedLineStrings.get(t));
+    for (let t = 0, T = patch.addedLineCount; t < T; ++t)
+      strings.push(textLayout.getLineString(patch.startingRow + t));
 
     targetArray.splice(patch.startingRow, patch.deletedLineCount, ... strings);
   };
@@ -21,14 +24,13 @@
       }
     }
 
-    return mustUpdate ? this.reset() : {startingRow: 0, deletedLineCount: 0, addedLineStrings: {size: () => 0}};
+    return mustUpdate ? this.reset() : null;
   };
 
-  Module.TextLayout.prototype.setText = text => {
-    this.setCharacterGetter(index => text.charAt(text));
-    this.setCharacterCountGetter(() => text.length);
-
-    return this.reset();
+  Module.TextLayout.prototype[Symbol.iterator] = function* () {
+    for (let t = 0, T = this.getRowCount(); t < T; ++t) {
+      yield this.getLineString(t);
+    }
   };
 
   return Module;

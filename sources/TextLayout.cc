@@ -1,9 +1,5 @@
 #include <cassert>
 
-#ifdef __EMSCRIPTEN__
-# include <emscripten/bind.h>
-#endif
-
 #include <algorithm>
 #include <sstream>
 #include <string>
@@ -23,13 +19,7 @@ TextLayout::TextLayout(void)
 , m_allowWordBreaks(false)
 , m_demoteNewlines(false)
 , m_justifyText(false)
-#ifndef __EMSCRIPTEN__
-, m_getCharacter()
-, m_getCharacterCount()
-#else
-, m_getCharacter(emscripten::val::undefined())
-, m_getCharacterCount(emscripten::val::undefined())
-#endif
+, m_source()
 , m_lineSizeContainer()
 , m_softWrapCount(0)
 , m_lines{ Line{ Token(TOKEN_DYNAMIC) } }
@@ -189,32 +179,6 @@ bool TextLayout::setJustifyText(bool justifyText)
     return true;
 }
 
-#ifndef __EMSCRIPTEN__
-
-void TextLayout::setCharacterGetter(std::function<char(unsigned)> const & characterGetter)
-{
-    m_getCharacter = characterGetter;
-}
-
-void TextLayout::setCharacterCountGetter(std::function<unsigned(void)> const & characterCountGetter)
-{
-    m_getCharacterCount = characterCountGetter;
-}
-
-#else
-
-void TextLayout::setCharacterGetter(emscripten::val const & characterGetter)
-{
-    m_getCharacter = characterGetter;
-}
-
-void TextLayout::setCharacterCountGetter(emscripten::val const & characterCountGetter)
-{
-    m_getCharacterCount = characterCountGetter;
-}
-
-#endif
-
 unsigned TextLayout::getRowCount(void) const
 {
     return m_lines.size();
@@ -232,11 +196,7 @@ unsigned TextLayout::getSoftWrapCount(void) const
 
 unsigned TextLayout::getMaxCharacterIndex(void) const
 {
-#ifndef __EMSCRIPTEN__
-    return m_getCharacterCount();
-#else
-    return m_getCharacterCount().as<unsigned>();
-#endif
+    return m_source.size();
 }
 
 Position TextLayout::getFirstPosition(void) const
@@ -254,6 +214,13 @@ bool TextLayout::doesSoftWrap(unsigned row) const
     assert(row < m_lines.size());
 
     return m_lines.at(row).doesSoftWrap;
+}
+
+std::string const & TextLayout::getLineString(unsigned row) const
+{
+    assert(row < m_lines.size());
+
+    return m_lines.at(row).string;
 }
 
 TokenLocator TextLayout::findTokenLocatorForPosition(Position const & position) const
@@ -615,24 +582,24 @@ TextOperation TextLayout::reset(void)
 {
     assert(m_lines.size() > 0);
 
-#ifndef __EMSCRIPTEN__
-    auto characterCount = m_getCharacterCount();
-#else
-    auto characterCount = m_getCharacterCount().as<unsigned>();
-#endif
+    auto characterCount = m_source.size();
 
-    return this->update(0, m_lines.back().inputOffset + m_lines.back().inputLength, characterCount);
+    return this->update(0, characterCount, m_source);
 }
 
-TextOperation TextLayout::update(unsigned start, unsigned removed, unsigned added)
+TextOperation TextLayout::reset(std::string const & source)
 {
-#ifndef __EMSCRIPTEN__
-    #define GET_CHARACTER_COUNT() m_getCharacterCount()
-    #define GET_CHARACTER(OFFSET) m_getCharacter(OFFSET)
-#else
-    #define GET_CHARACTER_COUNT() m_getCharacterCount().as<unsigned>()
-    #define GET_CHARACTER(OFFSET) m_getCharacter(OFFSET).as<char>()
-#endif
+    assert(m_lines.size() > 0);
+
+    auto characterCount = m_source.size();
+
+    return this->update(0, characterCount, source);
+}
+
+TextOperation TextLayout::update(unsigned start, unsigned removed, std::string const & added)
+{
+    #define GET_CHARACTER_COUNT() m_source.size()
+    #define GET_CHARACTER(OFFSET) m_source.at(OFFSET)
 
     #define SET_OFFSET(OFFSET) do { offset = (OFFSET); offsetChar = offset < offsetMax ? GET_CHARACTER(offset) : '?'; } while (0)
 
@@ -654,6 +621,10 @@ TextOperation TextLayout::update(unsigned start, unsigned removed, unsigned adde
 
     #define NEW_TOKEN(TYPE) ({ Token token = Token(TYPE); token.inputOffset = currentLine.inputLength; token.outputOffset = currentLine.outputLength; token; })
     #define PUSH_TOKEN(TOKEN) do { Token const & _token = (TOKEN); currentLine.tokens.push_back(_token); currentLine.inputLength += _token.inputLength; currentLine.outputLength += _token.outputLength; } while (0)
+
+    // Insert the updated patch into the source if we need to (ie not when just doing a reset)
+    if (&added != &m_source || start != 0 || removed != m_source.size())
+        m_source = m_source.substr(0, start) + added + m_source.substr(start + removed);
 
     // Create a structure that we will use to return a proper layout update (startingRow, removedLineCount & addedLines)
     TextOperation textOperation;
@@ -685,11 +656,14 @@ TextOperation TextLayout::update(unsigned start, unsigned removed, unsigned adde
     // Compute the number of rows that we know have been deleted (this number might be increased later if newly generated rows invalidate their successors)
     textOperation.deletedLineCount = rowEnd - rowStart;
 
+    // We start with zero added lines
+    textOperation.addedLineCount = 0;
+
     // Check that the configuration isn't weird, and then start looping over each character
     if (effectiveColumns == 0) {
 
+        textOperation.addedLineCount += 1;
         textOperation.addedLines.push_back(Line{ Token(TOKEN_DYNAMIC) });
-        textOperation.addedLineStrings.push_back("");
 
     } else while (offset < offsetEnd) {
 
@@ -699,7 +673,7 @@ TextOperation TextLayout::update(unsigned start, unsigned removed, unsigned adde
         // Find its predecessor
         Line const * previousLine = nullptr;
 
-        if (textOperation.addedLines.size() > 0)
+        if (textOperation.addedLineCount > 0)
             previousLine = &(textOperation.addedLines.back());
         else if (rowStart > 0)
             previousLine = &(m_lines.at(rowStart - 1));
@@ -959,18 +933,16 @@ TextOperation TextLayout::update(unsigned start, unsigned removed, unsigned adde
 
         assert(currentLine.tokens.size() > 0);
 
-        std::string lineString;
-
         for (auto & token : currentLine.tokens)
-            lineString += token.string;
+            currentLine.string += token.string;
 
+        textOperation.addedLineCount += 1;
         textOperation.addedLines.push_back(currentLine);
-        textOperation.addedLineStrings.push_back(lineString);
 
-        while (rowStart + textOperation.deletedLineCount != m_lines.size() && m_lines.at(rowStart + textOperation.deletedLineCount).inputOffset + added < offset + removed)
+        while (rowStart + textOperation.deletedLineCount != m_lines.size() && m_lines.at(rowStart + textOperation.deletedLineCount).inputOffset + added.size() < offset + removed)
             textOperation.deletedLineCount += 1;
 
-        if (rowStart + textOperation.deletedLineCount != m_lines.size() && m_lines.at(rowStart + textOperation.deletedLineCount).inputOffset + added == offset + removed)
+        if (rowStart + textOperation.deletedLineCount != m_lines.size() && m_lines.at(rowStart + textOperation.deletedLineCount).inputOffset + added.size() == offset + removed)
             break;
 
         if (!hasNewline && IS_END_OF_FILE()) {
@@ -1003,7 +975,7 @@ void TextLayout::apply(TextOperation const & textOperation)
 
     assert(m_lines.size() > 0);
 
-    for (unsigned t = 0u; t < textOperation.addedLines.size(); ++t) {
+    for (unsigned t = 0u; t < textOperation.addedLineCount; ++t) {
 
         Line const & line = m_lines.at(textOperation.startingRow + t);
 
@@ -1015,7 +987,7 @@ void TextLayout::apply(TextOperation const & textOperation)
 
     }
 
-    for (unsigned t = std::max(1u, static_cast<unsigned>(textOperation.startingRow + textOperation.addedLines.size())); t < m_lines.size(); ++t) {
+    for (unsigned t = std::max(1u, static_cast<unsigned>(textOperation.startingRow + textOperation.addedLineCount)); t < m_lines.size(); ++t) {
         m_lines.at(t).inputOffset = m_lines.at(t - 1).inputOffset + m_lines.at(t - 1).inputLength;
         m_lines.at(t).outputOffset = m_lines.at(t - 1).outputOffset + m_lines.at(t - 1).outputLength;
     }

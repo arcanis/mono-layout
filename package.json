@@ -4,6 +4,7 @@
   "license": "MIT",
   "devDependencies": {
     "@manaflair/term-strings": "^0.10.0",
+    "faker": "^4.1.0",
     "glob": "^7.1.1"
   }
 }

@@ -1,6 +1,6 @@
 # [![Text-Layout](/logo.png?raw=true)](https://github.com/manaflair/text-layout)
 
-> Hopefully fast implementation of a browser-like text layout engine
+> Fast implementation of a browser-like text layout engine, for Node and browsers
 
 [![](https://img.shields.io/npm/v/@manaflair/text-layout.svg)]() [![](https://img.shields.io/npm/l/@manaflair/text-layout.svg)]()
 
@@ -24,25 +24,22 @@ Currently not implemented:
 ## Installation
 
 ```
-$> npm install --save @manaflair/text-layout
+$> yarn add @manaflair/text-layout
 ```
 
 ## Usage
 
 ```js
-import { TextLayout } from '@manaflair/text-layout';
+const {TextLayout} = require(`@manaflair/text-layout`);
+const faker = require(`faker`);
 
-let string = `Lorem ipsum ...`;
+const textLayout = new TextLayout();
+textLayout.setConfiguration({columns: 80, justifyText: true});
+textLayout.reset(faker.lorem.paragraphs(10, `\n\n`));
 
-let textLayout = new TextLayout();
-textLayout.setCharacterGetter(offset => string.charCodeAt(offset));
-textLayout.setCharacterCountGetter(() => string.length);
-
-textLayout.setColumns(80);
-textLayout.setJustifyText(true);
-let patch = textLayout.reset();
-
-console.log(patch.addedLines.join(`\n`));
+for (const line of textLayout) {
+  console.log(line);
+}
 ```
 
 ## Tests
@@ -57,8 +54,8 @@ $> make tests DEBUG=1
 ### Testing the JS module
 
 ```
-$> npm run build:all
-$> npm run test:all
+$> yarn
+$> node sources/run-tests.js
 ```
 
 ## License (MIT)

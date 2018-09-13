@@ -59,12 +59,11 @@ function makeEnv() {
 
     let layout = new bindings.TextLayout();
 
-    let str = '';
     let otp = [ '' ];
 
     function APPLY(patch) {
 
-        bindings.applyPatch(patch, otp);
+        bindings.applyPatch(layout, patch, otp);
 
     }
 
@@ -74,12 +73,9 @@ function makeEnv() {
 
     function SETUP(newStr) {
 
-        layout.setCharacterGetter(offset => str.charCodeAt(offset));
-        layout.setCharacterCountGetter(() => str.length);
-
         str = newStr;
 
-        APPLY(layout.reset());
+        APPLY(layout.reset(newStr));
 
     }
 
@@ -91,8 +87,7 @@ function makeEnv() {
 
     function SPLICE(start, length, replacement) {
 
-        str = str.substr(0, start) + replacement + str.substr(start + length);
-        APPLY(layout.update(start, length, replacement.length));
+        APPLY(layout.update(start, length, replacement));
 
     }
 

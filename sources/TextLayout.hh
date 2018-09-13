@@ -4,10 +4,6 @@
 #include <memory>
 #include <vector>
 
-#ifdef __EMSCRIPTEN__
-# include <emscripten/val.h>
-#endif
-
 #include "./LineSizeContainer.hh"
 #include "./Line.hh"
 #include "./Position.hh"
@@ -46,20 +42,6 @@ class TextLayout {
     bool setDemoteNewlines(bool demoteNewlines);
     bool setJustifyText(bool justifyText);
 
- public: // interfacing callbacks
-
-#ifndef __EMSCRIPTEN__
-
-    void setCharacterGetter(std::function<char(unsigned)> const & m_getCharacter);
-    void setCharacterCountGetter(std::function<unsigned(void)> const & m_getCharacterCount);
-
-#else
-
-    void setCharacterGetter(emscripten::val const & getCharacter);
-    void setCharacterCountGetter(emscripten::val const & getCharacterCount);
-
-#endif
-
  public: // state info getters
 
     unsigned getRowCount(void) const;
@@ -71,6 +53,8 @@ class TextLayout {
     Position getLastPosition(void) const;
 
     bool doesSoftWrap(unsigned row) const;
+
+    std::string const & getLineString(unsigned row) const;
 
  public: // cursor management
 
@@ -93,7 +77,9 @@ class TextLayout {
  public: // state mutators
 
     TextOperation reset(void);
-    TextOperation update(unsigned start, unsigned deleted, unsigned added);
+    TextOperation reset(std::string const & source);
+
+    TextOperation update(unsigned start, unsigned deleted, std::string const & added);
 
 #ifdef DEBUG
 
@@ -125,17 +111,7 @@ class TextLayout {
     bool m_demoteNewlines;
     bool m_justifyText;
 
-#ifndef __EMSCRIPTEN__
-
-    std::function<char(unsigned)> m_getCharacter;
-    std::function<unsigned(void)> m_getCharacterCount;
-
-#else
-
-    emscripten::val m_getCharacter;
-    emscripten::val m_getCharacterCount;
-
-#endif
+    std::string m_source;
 
     LineSizeContainer m_lineSizeContainer;
     unsigned m_softWrapCount;

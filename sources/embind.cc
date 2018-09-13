@@ -13,7 +13,7 @@ EMSCRIPTEN_BINDINGS(text_layout)
     value_object<TextOperation>("TextOperation")
         .field("startingRow", &TextOperation::startingRow)
         .field("deletedLineCount", &TextOperation::deletedLineCount)
-        .field("addedLineStrings", &TextOperation::addedLineStrings);
+        .field("addedLineCount", &TextOperation::addedLineCount);
 
     value_object<Position>("Position")
         .field("x", &Position::x)
@@ -42,9 +42,6 @@ EMSCRIPTEN_BINDINGS(text_layout)
         .function("setDemoteNewlines", &TextLayout::setDemoteNewlines)
         .function("setJustifyText", &TextLayout::setJustifyText)
 
-        .function("setCharacterGetter", &TextLayout::setCharacterGetter)
-        .function("setCharacterCountGetter", &TextLayout::setCharacterCountGetter)
-
         .function("getRowCount", &TextLayout::getRowCount)
         .function("getColumnCount", &TextLayout::getColumnCount)
         .function("getSoftWrapCount", &TextLayout::getSoftWrapCount)
@@ -52,6 +49,7 @@ EMSCRIPTEN_BINDINGS(text_layout)
         .function("getFirstPosition", &TextLayout::getFirstPosition)
         .function("getLastPosition", &TextLayout::getLastPosition)
         .function("doesSoftWrap", &TextLayout::doesSoftWrap)
+        .function("getLineString", &TextLayout::getLineString)
 
         .function("getFixedPosition", &TextLayout::getFixedPosition)
         .function("getPositionLeft", &TextLayout::getPositionLeft)
@@ -65,7 +63,8 @@ EMSCRIPTEN_BINDINGS(text_layout)
         .function("getPositionForCharacterIndex", &TextLayout::getPositionForCharacterIndex)
         .function("getCharacterIndexForPosition", &TextLayout::getCharacterIndexForPosition)
 
-        .function("reset", &TextLayout::reset)
+        .function("reset", select_overload<TextOperation (void)>(&TextLayout::reset))
+        .function("reset", select_overload<TextOperation (std::string const &)>(&TextLayout::reset))
         .function("update", &TextLayout::update)
         ;
 }

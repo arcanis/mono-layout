@@ -4,11 +4,6 @@
 # include <iostream>
 #endif
 
-#ifdef NBIND
-# include <nbind/api.h>
-# include <nbind/BindDefiner.h>
-#endif
-
 struct Position {
 
     unsigned x;
