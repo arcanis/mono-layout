@@ -1,12 +1,1 @@
-node_modules
-*.a
-*.o
-*.d
-
-*.gypi
-!/final-flags.gypi
-
-/build
-!/build/Release/nbind.js
-
-npm-debug.log*
+sources
