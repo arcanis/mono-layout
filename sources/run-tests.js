@@ -3,7 +3,7 @@ let fs = require(`fs`);
 let glob = require(`glob`);
 let vm = require(`vm`);
 
-let bindings = require(`./entry-${process.argv[2]}`);
+let bindings = require(`../sync`);
 
 let ok = `${ts.style.color.front(`green`).in}✓${ts.style.color.front.out}`;
 let ko = `${ts.style.color.front(`red`).in}✗${ts.style.color.front.out}`;
@@ -64,7 +64,7 @@ function makeEnv() {
 
     function APPLY(patch) {
 
-        patch.apply(otp);
+        bindings.applyPatch(patch, otp);
 
     }
 
@@ -122,7 +122,7 @@ function makeEnv() {
 
     }
 
-    return { layout, SETUP_EMPTY, SETUP, RESET, SPLICE, APPEND, LINE_COUNT, TEXT, REQUIRE, Position: (x, y) => new bindings.Position(x, y) };
+    return { layout, SETUP_EMPTY, SETUP, RESET, SPLICE, APPEND, LINE_COUNT, TEXT, REQUIRE, Position: (x, y) => ({x, y}) };
 
 }
 

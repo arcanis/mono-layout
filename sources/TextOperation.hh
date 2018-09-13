@@ -24,13 +24,4 @@ struct TextOperation {
     // The vector of generated line strings
     std::vector<std::string> addedLineStrings;
 
-#ifdef NBIND
-
-    void toJS(nbind::cbOutput expose) const
-    {
-        expose(startingRow, deletedLineCount, addedLineStrings);
-    }
-
-#endif
-
 };

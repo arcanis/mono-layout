@@ -31,15 +31,6 @@ struct Position {
         return x == other.x && y == other.y;
     }
 
-#ifdef NBIND
-
-    void toJS(nbind::cbOutput expose) const
-    {
-        expose(x, y);
-    }
-
-#endif
-
 };
 
 

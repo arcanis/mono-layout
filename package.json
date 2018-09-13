@@ -2,31 +2,8 @@
   "name": "@manaflair/text-layout",
   "version": "0.7.3",
   "license": "MIT",
-  "main": "./sources/entry-node",
-  "browser": "./sources/entry-browser",
-  "scripts": {
-    "autogypi": "autogypi",
-    "node-gyp": "node-gyp",
-    "emcc-path": "emcc-path",
-    "build:node": "npm run node-gyp configure build",
-    "build:browser": "npm run node-gyp configure build --asmjs=1",
-    "build:browser:maybe": "test -f build/Release/nbind.js || test -n \"$CI\" || ! command -v em++ 2>&1 > /dev/null || npm run build:browser",
-    "build:all": "npm run build:node && npm run build:browser",
-    "build": "npm run build:all",
-    "test:node": "time node sources/run-tests node",
-    "test:browser": "time node sources/run-tests browser",
-    "test:all": "npm run test:node && npm run test:browser",
-    "test": "npm run test:all",
-    "install": "npm run autogypi && npm run build:node && npm run build:browser:maybe",
-    "prepublish": "test -f build/Release/nbind.js"
-  },
-  "dependencies": {
-    "autogypi": "^0.2.2",
-    "nbind": "^0.3.12",
-    "node-gyp": "^3.4.0"
-  },
   "devDependencies": {
-    "@manaflair/term-strings": "^0.3.0",
+    "@manaflair/term-strings": "^0.10.0",
     "glob": "^7.1.1"
   }
 }

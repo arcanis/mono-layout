@@ -1,12 +1,12 @@
 #include <cassert>
 
+#ifdef __EMSCRIPTEN__
+# include <emscripten/bind.h>
+#endif
+
 #include <algorithm>
 #include <sstream>
 #include <string>
-
-#ifdef NBIND
-# include <nbind/api.h>
-#endif
 
 #include "./Line.hh"
 #include "./TextLayout.hh"
@@ -23,8 +23,13 @@ TextLayout::TextLayout(void)
 , m_allowWordBreaks(false)
 , m_demoteNewlines(false)
 , m_justifyText(false)
+#ifndef __EMSCRIPTEN__
 , m_getCharacter()
 , m_getCharacterCount()
+#else
+, m_getCharacter(emscripten::val::undefined())
+, m_getCharacterCount(emscripten::val::undefined())
+#endif
 , m_lineSizeContainer()
 , m_softWrapCount(0)
 , m_lines{ Line{ Token(TOKEN_DYNAMIC) } }
@@ -90,6 +95,7 @@ bool TextLayout::setColumns(unsigned columns)
 
     // When soft wrapping is enabled but the number of columns is lower or equal to the new number of columns, we don't have to reset the layout if none of the lines are soft-wrapping
     // Note that we also need to check to make sure that getColumnCount() is higher than zero, because it's a special case that can be reached if the previous maximal number of columns is 0
+    // Finally, we cannot apply this heuristic when the text is justified, since it might cause the layout to change
     if (this->getColumnCount() > 0 && this->getColumnCount() <= m_columns && this->getSoftWrapCount() == 0)
         return false;
 
@@ -113,9 +119,10 @@ bool TextLayout::setSoftWrap(bool softWrap)
 
     m_softWrap = softWrap;
 
-    // We don't need to reset the layout if the maximal number of row is higher than the current number of columns
-    // We also check that the number of soft wrap is 0, but that's not strictly required since we will only reach this code path when switching from wrap=off to wrap=on, in which case the soft wrap count will always be 0
-    if (this->getColumnCount() <= m_columns && this->getSoftWrapCount() == 0)
+    if (m_softWrap == true && this->getColumnCount() <= m_columns)
+        return false;
+
+    if (m_softWrap == false && this->getSoftWrapCount() == 0)
         return false;
 
     return true;
@@ -182,7 +189,7 @@ bool TextLayout::setJustifyText(bool justifyText)
     return true;
 }
 
-#ifndef NBIND
+#ifndef __EMSCRIPTEN__
 
 void TextLayout::setCharacterGetter(std::function<char(unsigned)> const & characterGetter)
 {
@@ -196,14 +203,14 @@ void TextLayout::setCharacterCountGetter(std::function<unsigned(void)> const & c
 
 #else
 
-void TextLayout::setCharacterGetter(nbind::cbFunction & characterGetter)
+void TextLayout::setCharacterGetter(emscripten::val const & characterGetter)
 {
-    m_getCharacter.reset(new nbind::cbFunction(characterGetter));
+    m_getCharacter = characterGetter;
 }
 
-void TextLayout::setCharacterCountGetter(nbind::cbFunction & characterCountGetter)
+void TextLayout::setCharacterCountGetter(emscripten::val const & characterCountGetter)
 {
-    m_getCharacterCount.reset(new nbind::cbFunction(characterCountGetter));
+    m_getCharacterCount = characterCountGetter;
 }
 
 #endif
@@ -225,10 +232,10 @@ unsigned TextLayout::getSoftWrapCount(void) const
 
 unsigned TextLayout::getMaxCharacterIndex(void) const
 {
-#ifndef NBIND
+#ifndef __EMSCRIPTEN__
     return m_getCharacterCount();
 #else
-    return m_getCharacterCount->call<unsigned>();
+    return m_getCharacterCount().as<unsigned>();
 #endif
 }
 
@@ -608,10 +615,10 @@ TextOperation TextLayout::reset(void)
 {
     assert(m_lines.size() > 0);
 
-#ifndef NBIND
+#ifndef __EMSCRIPTEN__
     auto characterCount = m_getCharacterCount();
 #else
-    auto characterCount = m_getCharacterCount->call<unsigned>();
+    auto characterCount = m_getCharacterCount().as<unsigned>();
 #endif
 
     return this->update(0, m_lines.back().inputOffset + m_lines.back().inputLength, characterCount);
@@ -619,12 +626,12 @@ TextOperation TextLayout::reset(void)
 
 TextOperation TextLayout::update(unsigned start, unsigned removed, unsigned added)
 {
-#ifndef NBIND
+#ifndef __EMSCRIPTEN__
     #define GET_CHARACTER_COUNT() m_getCharacterCount()
     #define GET_CHARACTER(OFFSET) m_getCharacter(OFFSET)
 #else
-    #define GET_CHARACTER_COUNT() m_getCharacterCount->call<unsigned>()
-    #define GET_CHARACTER(OFFSET) m_getCharacter->call<char>(OFFSET)
+    #define GET_CHARACTER_COUNT() m_getCharacterCount().as<unsigned>()
+    #define GET_CHARACTER(OFFSET) m_getCharacter(OFFSET).as<char>()
 #endif
 
     #define SET_OFFSET(OFFSET) do { offset = (OFFSET); offsetChar = offset < offsetMax ? GET_CHARACTER(offset) : '?'; } while (0)

@@ -4,8 +4,8 @@
 #include <memory>
 #include <vector>
 
-#ifdef NBIND
-# include <nbind/api.h>
+#ifdef __EMSCRIPTEN__
+# include <emscripten/val.h>
 #endif
 
 #include "./LineSizeContainer.hh"
@@ -48,15 +48,15 @@ class TextLayout {
 
  public: // interfacing callbacks
 
-#ifndef NBIND
+#ifndef __EMSCRIPTEN__
 
     void setCharacterGetter(std::function<char(unsigned)> const & m_getCharacter);
     void setCharacterCountGetter(std::function<unsigned(void)> const & m_getCharacterCount);
 
 #else
 
-    void setCharacterGetter(nbind::cbFunction & getCharacter);
-    void setCharacterCountGetter(nbind::cbFunction & getCharacterCount);
+    void setCharacterGetter(emscripten::val const & getCharacter);
+    void setCharacterCountGetter(emscripten::val const & getCharacterCount);
 
 #endif
 
@@ -125,15 +125,15 @@ class TextLayout {
     bool m_demoteNewlines;
     bool m_justifyText;
 
-#ifndef NBIND
+#ifndef __EMSCRIPTEN__
 
     std::function<char(unsigned)> m_getCharacter;
     std::function<unsigned(void)> m_getCharacterCount;
 
 #else
 
-    std::unique_ptr<nbind::cbFunction> m_getCharacter;
-    std::unique_ptr<nbind::cbFunction> m_getCharacterCount;
+    emscripten::val m_getCharacter;
+    emscripten::val m_getCharacterCount;
 
 #endif
 

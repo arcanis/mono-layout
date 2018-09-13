@@ -93,22 +93,22 @@ TEST_CASE("#getPositionAbove()")
     {
         SETUP("Hello\nWorld");
 
-        REQUIRE(layout.getPositionAbove(Position(2, 1)) == Position(2, 0));
+        REQUIRE(layout.getPositionAbove(Position(2, 1), 1) == Position(2, 0));
     }
 
     SECTION("it should prevent jumping inside tokens that cannot be subdivided")
     {
         SETUP("Hello\tWorld\nThis is a test");
 
-        REQUIRE(layout.getPositionAbove(Position(6, 1)) == Position(5, 0));
-        REQUIRE(layout.getPositionAbove(Position(8, 1)) == Position(9, 0));
+        REQUIRE(layout.getPositionAbove(Position(6, 1), 1) == Position(5, 0));
+        REQUIRE(layout.getPositionAbove(Position(8, 1), 1) == Position(9, 0));
     }
 
     SECTION("it should move to the beginning of the line when already on the very first line")
     {
         SETUP("Hello World");
 
-        REQUIRE(layout.getPositionAbove(Position(5, 0)) == Position(0, 0));
+        REQUIRE(layout.getPositionAbove(Position(5, 0), 1) == Position(0, 0));
     }
 }
 
@@ -118,22 +118,22 @@ TEST_CASE("#getPositionBelow()")
     {
         SETUP("Hello\nWorld");
 
-        REQUIRE(layout.getPositionBelow(Position(2, 0)) == Position(2, 1));
+        REQUIRE(layout.getPositionBelow(Position(2, 0), 1) == Position(2, 1));
     }
 
     SECTION("it should prevent jumping inside tokens that cannot be subdivided")
     {
         SETUP("This is a test\nHello\tWorld");
 
-        REQUIRE(layout.getPositionBelow(Position(6, 0)) == Position(5, 1));
-        REQUIRE(layout.getPositionBelow(Position(8, 0)) == Position(9, 1));
+        REQUIRE(layout.getPositionBelow(Position(6, 0), 1) == Position(5, 1));
+        REQUIRE(layout.getPositionBelow(Position(8, 0), 1) == Position(9, 1));
     }
 
     SECTION("it should move to the end of the line when already on the very last line")
     {
         SETUP("Hello World");
 
-        REQUIRE(layout.getPositionBelow(Position(5, 0)) == Position(11, 0));
+        REQUIRE(layout.getPositionBelow(Position(5, 0), 1) == Position(11, 0));
     }
 }
 
