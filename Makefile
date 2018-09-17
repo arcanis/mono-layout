@@ -49,5 +49,7 @@ test:		$(OBJ_SRC) $(OBJ_TESTS)
 		/tmp/testsuite
 
 $(TARGET):	$(OBJ_SRC)
-		ar rf $(TARGET) $(OBJ_SRC)
+		ar r $(TARGET) $(OBJ_SRC)
 		ranlib $(TARGET)
+
+.PHONY:		all clean webassembly fclean re test
