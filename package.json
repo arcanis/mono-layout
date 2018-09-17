@@ -1,6 +1,6 @@
 {
   "name": "@manaflair/text-layout",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "license": "MIT",
   "devDependencies": {
     "@manaflair/term-strings": "^0.10.0",
