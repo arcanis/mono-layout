@@ -13,7 +13,7 @@ DEPS		= $(SRC:%.cc=%.d) $(TESTS:%.cc=%.d)
 RM		= rm -f
 CXX		?= clang++
 
-CXXFLAGS	= -std=c++14 -W -Wall -Werror -MMD
+CXXFLAGS	= -std=c++14 -W -Wall -Werror -MMD -Isources/tests
 EMFLAGS		= -s ALLOW_MEMORY_GROWTH=1 --bind --pre-js ./sources/shell.pre.js --post-js ./sources/shell.post.js
 
 NODEPS		= clean fclean
