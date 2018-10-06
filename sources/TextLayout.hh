@@ -56,6 +56,9 @@ class TextLayout {
 
     std::string const & getLineString(unsigned row) const;
 
+    std::string const & getSourceText(void) const;
+    std::string getTransformedText(void) const;
+
  public: // cursor management
 
     Position getFixedPosition(Position position) const;
@@ -76,8 +79,8 @@ class TextLayout {
 
  public: // state mutators
 
-    TextOperation reset(void);
-    TextOperation reset(std::string const & source);
+    TextOperation clearText(void);
+    TextOperation setText(std::string const & source);
 
     TextOperation update(unsigned start, unsigned deleted, std::string const & added);
 

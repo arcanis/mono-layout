@@ -75,13 +75,13 @@ function makeEnv() {
 
         str = newStr;
 
-        APPLY(layout.reset(newStr));
+        APPLY(layout.setText(newStr));
 
     }
 
     function RESET() {
 
-        APPLY(layout.reset());
+        APPLY(layout.clearText());
 
     }
 

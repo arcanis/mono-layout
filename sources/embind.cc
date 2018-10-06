@@ -50,6 +50,8 @@ EMSCRIPTEN_BINDINGS(text_layout)
         .function("getLastPosition", &TextLayout::getLastPosition)
         .function("doesSoftWrap", &TextLayout::doesSoftWrap)
         .function("getLineString", &TextLayout::getLineString)
+        .function("getSourceText", &TextLayout::getSourceText)
+        .function("getTransformedText", &TextLayout::getTransformedText)
 
         .function("getFixedPosition", &TextLayout::getFixedPosition)
         .function("getPositionLeft", &TextLayout::getPositionLeft)
@@ -63,8 +65,8 @@ EMSCRIPTEN_BINDINGS(text_layout)
         .function("getPositionForCharacterIndex", &TextLayout::getPositionForCharacterIndex)
         .function("getCharacterIndexForPosition", &TextLayout::getCharacterIndexForPosition)
 
-        .function("reset", select_overload<TextOperation (void)>(&TextLayout::reset))
-        .function("reset", select_overload<TextOperation (std::string const &)>(&TextLayout::reset))
+        .function("clearText", &TextLayout::clearText)
+        .function("setText", &TextLayout::setText)
         .function("update", &TextLayout::update)
         ;
 }

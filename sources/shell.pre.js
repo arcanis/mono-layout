@@ -42,5 +42,7 @@ module.exports = (wasmBinary, readyCallback) => {
       }
     };
 
-    readyCallback(Module);
+    if (readyCallback) {
+      readyCallback(Module);
+    }
   };

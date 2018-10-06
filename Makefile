@@ -1,3 +1,5 @@
+SHELL		= bash
+
 TARGET		= libtformat.a
 
 SRC		= $(shell find sources -name '*.cc' -a -not -name '*.test.cc' -a -not -name 'embind.cc')

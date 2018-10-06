@@ -223,6 +223,23 @@ std::string const & TextLayout::getLineString(unsigned row) const
     return m_lines.at(row).string;
 }
 
+std::string const & TextLayout::getSourceText(void) const
+{
+    return m_source;
+}
+
+std::string TextLayout::getTransformedText(void) const
+{
+    std::string str = m_lines.front().string;
+
+    for (unsigned t = 1; t < m_lines.size(); ++t) {
+        str += "\n";
+        str += m_lines.at(t).string;
+    }
+
+    return str;
+}
+
 TokenLocator TextLayout::findTokenLocatorForPosition(Position const & position) const
 {
     assert(position.y < m_lines.size());
@@ -578,7 +595,7 @@ unsigned TextLayout::getCharacterIndexForPosition(Position position) const
     }
 }
 
-TextOperation TextLayout::reset(void)
+TextOperation TextLayout::clearText(void)
 {
     assert(m_lines.size() > 0);
 
@@ -587,7 +604,7 @@ TextOperation TextLayout::reset(void)
     return this->update(0, characterCount, m_source);
 }
 
-TextOperation TextLayout::reset(std::string const & source)
+TextOperation TextLayout::setText(std::string const & source)
 {
     assert(m_lines.size() > 0);
 

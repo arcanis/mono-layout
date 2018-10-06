@@ -19,7 +19,7 @@
     layout.setCharacterCountGetter(provider.getCharacterCountGetter()); \
                                                                         \
     TextOutput output = TextOutput();                                   \
-    output.apply(layout.reset());                                       \
+    output.apply(layout.clearText());                                   \
 
 #define SPLICE(OFFSET, LENGTH, REPLACEMENT)                          \
 {                                                                    \
@@ -39,10 +39,10 @@
     SPLICE(provider.getCharacterCount(), 0, STRING); \
 }                                                    \
 
-#define RESET()                   \
-{                                 \
-    output.apply(layout.reset()); \
-}                                 \
+#define RESET()                       \
+{                                     \
+    output.apply(layout.clearText()); \
+}                                     \
 
 #define TEXT()        \
 ({                    \
