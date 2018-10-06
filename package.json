@@ -2,6 +2,7 @@
   "name": "@manaflair/text-layout",
   "version": "0.9.3",
   "license": "MIT",
+  "typings": "./index.d.ts",
   "devDependencies": {
     "@manaflair/term-strings": "^0.10.0",
     "faker": "^4.1.0",
