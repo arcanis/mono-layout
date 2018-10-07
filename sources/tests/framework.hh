@@ -9,34 +9,34 @@
                                       \
     TextLayout layout = TextLayout(); \
 
-#define SETUP(STR)                     \
-                                       \
-    TextLayout layout = TextLayout();  \
-                                       \
-    TextOutput output = TextOutput();  \
-    output.apply(layout.setText(STR)); \
+#define SETUP(STR)                       \
+                                         \
+    TextLayout layout = TextLayout();    \
+                                         \
+    TextOutput output = TextOutput();    \
+    output.apply(layout.setSource(STR)); \
 
-#define SPLICE(OFFSET, LENGTH, REPLACEMENT)                   \
-{                                                             \
-    auto offset = (OFFSET);                                   \
-    auto length = (LENGTH);                                   \
-                                                              \
-    std::ostringstream replacementBuilder;                    \
-    replacementBuilder << (REPLACEMENT);                      \
-    std::string replacement = replacementBuilder.str();       \
-                                                              \
-    output.apply(layout.update(offset, length, replacement)); \
-}                                                             \
+#define SPLICE(OFFSET, LENGTH, REPLACEMENT)                         \
+{                                                                   \
+    auto offset = (OFFSET);                                         \
+    auto length = (LENGTH);                                         \
+                                                                    \
+    std::ostringstream replacementBuilder;                          \
+    replacementBuilder << (REPLACEMENT);                            \
+    std::string replacement = replacementBuilder.str();             \
+                                                                    \
+    output.apply(layout.spliceSource(offset, length, replacement)); \
+}                                                                   \
 
 #define APPEND(STRING)                                \
 {                                                     \
     SPLICE(layout.getMaxCharacterIndex(), 0, STRING); \
 }                                                     \
 
-#define RESET()                       \
-{                                     \
-    output.apply(layout.clearText()); \
-}                                     \
+#define RESET()                         \
+{                                       \
+    output.apply(layout.clearSource()); \
+}                                       \
 
 #define TEXT()        \
 ({                    \
