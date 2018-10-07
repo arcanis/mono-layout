@@ -75,19 +75,19 @@ function makeEnv() {
 
         str = newStr;
 
-        APPLY(layout.setText(newStr));
+        APPLY(layout.setSource(newStr));
 
     }
 
     function RESET() {
 
-        APPLY(layout.clearText());
+        APPLY(layout.clearSource());
 
     }
 
     function SPLICE(start, length, replacement) {
 
-        APPLY(layout.update(start, length, replacement));
+        APPLY(layout.spliceSource(start, length, replacement));
 
     }
 

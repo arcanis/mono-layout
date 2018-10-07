@@ -14,7 +14,7 @@ module.exports = (wasmBinary, readyCallback) => {
       const strings = [];
 
       for (let t = 0, T = patch.addedLineCount; t < T; ++t)
-        strings.push(textLayout.getLineString(patch.startingRow + t));
+        strings.push(textLayout.getLine(patch.startingRow + t));
 
       targetArray.splice(patch.startingRow, patch.deletedLineCount, ... strings);
     };
@@ -38,7 +38,7 @@ module.exports = (wasmBinary, readyCallback) => {
 
     Module.TextLayout.prototype[Symbol.iterator] = function* () {
       for (let t = 0, T = this.getRowCount(); t < T; ++t) {
-        yield this.getLineString(t);
+        yield this.getLine(t);
       }
     };
 

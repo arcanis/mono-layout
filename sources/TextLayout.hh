@@ -54,10 +54,10 @@ class TextLayout {
 
     bool doesSoftWrap(unsigned row) const;
 
-    std::string const & getLineString(unsigned row) const;
+    std::string const & getSource(void) const;
 
-    std::string const & getSourceText(void) const;
-    std::string getTransformedText(void) const;
+    std::string getText(void) const;
+    std::string const & getLine(unsigned row) const;
 
  public: // cursor management
 
@@ -79,10 +79,11 @@ class TextLayout {
 
  public: // state mutators
 
-    TextOperation clearText(void);
-    TextOperation setText(std::string const & source);
+    TextOperation clearSource(void);
 
-    TextOperation update(unsigned start, unsigned deleted, std::string const & added);
+    TextOperation setSource(std::string const & source);
+
+    TextOperation spliceSource(unsigned start, unsigned deleted, std::string const & added);
 
 #ifdef DEBUG
 

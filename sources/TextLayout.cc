@@ -216,19 +216,12 @@ bool TextLayout::doesSoftWrap(unsigned row) const
     return m_lines.at(row).doesSoftWrap;
 }
 
-std::string const & TextLayout::getLineString(unsigned row) const
-{
-    assert(row < m_lines.size());
-
-    return m_lines.at(row).string;
-}
-
-std::string const & TextLayout::getSourceText(void) const
+std::string const & TextLayout::getSource(void) const
 {
     return m_source;
 }
 
-std::string TextLayout::getTransformedText(void) const
+std::string TextLayout::getText(void) const
 {
     std::string str = m_lines.front().string;
 
@@ -238,6 +231,13 @@ std::string TextLayout::getTransformedText(void) const
     }
 
     return str;
+}
+
+std::string const & TextLayout::getLine(unsigned row) const
+{
+    assert(row < m_lines.size());
+
+    return m_lines.at(row).string;
 }
 
 TokenLocator TextLayout::findTokenLocatorForPosition(Position const & position) const
@@ -595,25 +595,25 @@ unsigned TextLayout::getCharacterIndexForPosition(Position position) const
     }
 }
 
-TextOperation TextLayout::clearText(void)
+TextOperation TextLayout::clearSource(void)
 {
     assert(m_lines.size() > 0);
 
     auto characterCount = m_source.size();
 
-    return this->update(0, characterCount, m_source);
+    return this->spliceSource(0, characterCount, m_source);
 }
 
-TextOperation TextLayout::setText(std::string const & source)
+TextOperation TextLayout::setSource(std::string const & source)
 {
     assert(m_lines.size() > 0);
 
     auto characterCount = m_source.size();
 
-    return this->update(0, characterCount, source);
+    return this->spliceSource(0, characterCount, source);
 }
 
-TextOperation TextLayout::update(unsigned start, unsigned removed, std::string const & added)
+TextOperation TextLayout::spliceSource(unsigned start, unsigned removed, std::string const & added)
 {
     #define GET_CHARACTER_COUNT() m_source.size()
     #define GET_CHARACTER(OFFSET) m_source.at(OFFSET)
