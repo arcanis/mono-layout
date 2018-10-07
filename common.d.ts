@@ -1,3 +1,16 @@
+export type Configuration = {
+  columns: number,
+  tabWidth: number,
+
+  softWrap: boolean,
+  collapseWhitespaces: boolean,
+  preserveLeadingSpaces: boolean,
+  preserveTrailingSpaces: boolean,
+  allowWordBreaks: boolean,
+  demoteNewlines: boolean,
+  justifyText: boolean,
+};
+
 export type Position = {
   x: number,
   y: number,
@@ -32,6 +45,8 @@ export interface TextLayout {
   setDemoteNewlines(demoteNewlines: boolean): boolean;
   setJustifyText(justifyText: boolean): boolean;
 
+  setConfiguration(configuration: Partial<Configuration>): boolean;
+
   getRowCount(): number;
   getColumnCount(): number;
   getSoftWrapCount(): number;
@@ -65,6 +80,8 @@ export interface TextLayout {
   setText(source: string): TextOperation;
 
   update(start: number, deleted: number, added: string): TextOperation;
+
+  [Symbol.iterator](): IterableIterator<string>;
 }
 
 export interface TextLayoutConstructor {
@@ -73,4 +90,5 @@ export interface TextLayoutConstructor {
 
 export type TextLayoutStruct = {
   TextLayout: TextLayoutConstructor,
+  applyPatch: (textLayout: TextLayout, patch: TextOperation, destination: Array<string>) => void,
 };
