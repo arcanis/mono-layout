@@ -30,16 +30,29 @@ $> yarn add @manaflair/text-layout
 ## Usage
 
 ```js
-const {TextLayout} = require(`@manaflair/text-layout`);
+const {TextLayout} = require(`@manaflair/text-layout/sync`);
 const faker = require(`faker`);
 
 const textLayout = new TextLayout();
 textLayout.setConfiguration({columns: 80, justifyText: true});
-textLayout.reset(faker.lorem.paragraphs(10, `\n\n`));
+textLayout.setSource(faker.lorem.paragraphs(10, `\n\n`));
 
-for (const line of textLayout) {
-  console.log(line);
-}
+console.log(textLayout.getTransformedSource());
+```
+
+Note that the library also is available through an asynchronous endpoint (used by default). You typically will want to use this endpoint if your code is expected to work within browsers, since they may disallow WebAssembly to be compiled in the main thread. Here's what the code looks like with the asynchronous initialization:
+
+```js
+const tlPromise = require(`@manaflair/text-layout/async`);
+const faker = require(`faker`);
+
+tlPromise.then(({TextLayout}) => {
+  const textLayout = new TextLayout();
+  textLayout.setConfiguration({columns: 80, justifyText: true});
+  textLayout.setSource(faker.lorem.paragraphs(10, `\n\n`));
+
+  console.log(textLayout.getTransformedSource());
+});
 ```
 
 ## Tests
