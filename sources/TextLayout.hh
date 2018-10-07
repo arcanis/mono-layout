@@ -55,7 +55,6 @@ class TextLayout {
     bool doesSoftWrap(unsigned row) const;
 
     std::string const & getSource(void) const;
-
     std::string getText(void) const;
     std::string const & getLine(unsigned row) const;
 

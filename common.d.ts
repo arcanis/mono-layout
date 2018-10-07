@@ -57,10 +57,9 @@ export interface TextLayout {
 
   doesSoftWrap(row: number): boolean;
 
-  getLineString(row: number): string;
-
-  getSourceText(): string;
-  getTransformedText(): string;
+  getSource(): string;
+  getText(): string;
+  getLine(row: number): string;
 
   getFixedPosition(position: Position): Position;
 
