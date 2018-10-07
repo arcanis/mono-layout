@@ -1,6 +1,6 @@
 {
   "name": "@manaflair/text-layout",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "license": "MIT",
   "main": "./async.js",
   "typings": "./async.d.ts",
