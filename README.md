@@ -8,18 +8,18 @@
 
 ## Features
 
-  - Soft-wrap any text
-  - Can collapse text on demand
-  - Keep an internal state to map between the original and transformed coordinates
-  - Automatically justify the text to fit the specified width if requested
-  - Only relayout the part of the text that have changed
-  - Shipped as NPM module (w/ an asmjs fallback for browsers)
+  - Soft-wraps any text to the given width
+  - Automatically justifies the text to fit the specified width if requested
+  - Can collapse text on demand (`white-space: pre`, but more configurable)
+  - Keeps an internal state to map between the original and transformed text coordinates
+  - Only updates the part of the text that has changed for better performances
+  - Shipped as NPM package using WebAssembly (portable, even accross browsers)
   - Also available as a zero-dependencies C++ library
 
 Currently not implemented:
 
-  - Font width support
-  - Unicode support
+  - Font width support (all characters are assumed monospaces)
+  - Unicode support (all characters are assumed to be ASCII)
 
 ## Installation
 
@@ -40,7 +40,7 @@ textLayout.setSource(faker.lorem.paragraphs(10, `\n\n`));
 console.log(textLayout.getTransformedSource());
 ```
 
-Note that the library also is available through an asynchronous endpoint (used by default). You typically will want to use this endpoint if your code is expected to work within browsers, since they may disallow WebAssembly to be compiled in the main thread. Here's what the code looks like with the asynchronous initialization:
+Note that the library is also available through an asynchronous endpoint (used by default when requiring `@manaflair/text-layout`). You typically will want to use this endpoint if your code is expected to work within browsers, since they may disallow WebAssembly to be compiled in the main thread. Here's what the code looks like with the asynchronous initialization:
 
 ```js
 const tlPromise = require(`@manaflair/text-layout/async`);
