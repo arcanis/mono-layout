@@ -79,9 +79,7 @@ class TextLayout {
  public: // state mutators
 
     TextOperation clearSource(void);
-
     TextOperation setSource(std::string const & source);
-
     TextOperation spliceSource(unsigned start, unsigned deleted, std::string const & added);
 
 #ifdef DEBUG

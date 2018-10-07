@@ -75,10 +75,9 @@ export interface TextLayout {
   getPositionForCharacterIndex(characterIndex: number): Position;
   getCharacterIndexForPosition(position: Position): number;
 
-  clearText(): TextOperation;
-  setText(source: string): TextOperation;
-
-  update(start: number, deleted: number, added: string): TextOperation;
+  clearSource(): TextOperation;
+  setSource(source: string): TextOperation;
+  spliceSource(start: number, deleted: number, added: string): TextOperation;
 
   [Symbol.iterator](): IterableIterator<string>;
 }
