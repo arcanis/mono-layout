@@ -1,4 +1,6 @@
 #include <sstream>
+#include <string>
+#include <utility>
 
 #include <catch.hpp>
 
@@ -33,10 +35,10 @@
     SPLICE(layout.getMaxCharacterIndex(), 0, STRING); \
 }                                                     \
 
-#define RESET()                         \
-{                                       \
-    output.apply(layout.clearSource()); \
-}                                       \
+#define RESET()                                \
+{                                              \
+    output.apply(layout.applyConfiguration()); \
+}                                              \
 
 #define TEXT()        \
 ({                    \
@@ -51,3 +53,9 @@
 #define FOR(C, STR)                 \
                                     \
     for (auto c : std::string(STR))
+
+#define ASSERT_EQ(LEFT, RIGHT) \
+                               \
+    REQUIRE(LEFT == RIGHT)
+
+#define PositionRet(X, Y, PERFECT_FIT) std::pair<Position, bool>(Position(X, Y), PERFECT_FIT)

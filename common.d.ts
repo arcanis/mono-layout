@@ -63,11 +63,11 @@ export interface TextLayout {
 
   getFixedPosition(position: Position): Position;
 
-  getPositionLeft(position: Position): Position;
-  getPositionRight(position: Position): Position;
+  getPositionLeft(position: Position): [Position, boolean];
+  getPositionRight(position: Position): [Position, boolean];
 
-  getPositionAbove(position: Position, amplitude: number): Position;
-  getPositionBelow(position: Position, amplitude: number): Position;
+  getPositionAbove(position: Position, amplitude?: number): [Position, boolean];
+  getPositionBelow(position: Position, amplitude?: number): [Position, boolean];
 
   getRowForCharacterIndex(characterIndex: number): number;
   getCharacterIndexForRow(row: number): number;

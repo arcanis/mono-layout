@@ -31,7 +31,7 @@ module.exports = (readyCallback) => {
         }
       }
 
-      return mustUpdate ? this.reset() : null;
+      return mustUpdate ? this.applyConfiguration() : null;
     };
 
     Module.TextLayout.prototype[Symbol.iterator] = function* () {

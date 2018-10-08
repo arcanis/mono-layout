@@ -81,7 +81,7 @@ function makeEnv() {
 
     function RESET() {
 
-        APPLY(layout.clearSource());
+        APPLY(layout.applyConfiguration());
 
     }
 
@@ -117,7 +117,13 @@ function makeEnv() {
 
     }
 
-    return { layout, SETUP_EMPTY, SETUP, RESET, SPLICE, APPEND, LINE_COUNT, TEXT, REQUIRE, Position: (x, y) => ({x, y}) };
+    function ASSERT_EQ(left, right) {
+
+        REQUIRE(JSON.stringify(left) === JSON.stringify(right));
+
+    }
+
+    return { layout, SETUP_EMPTY, SETUP, RESET, SPLICE, APPEND, LINE_COUNT, TEXT, REQUIRE, ASSERT_EQ, Position: (x, y) => ({x, y}), PositionRet: (x, y, perfectFit) => [{x, y}, perfectFit] };
 
 }
 
@@ -127,15 +133,14 @@ for (let file of glob.sync(`**/*.test.cc`, { cwd: __dirname })) {
 
     let content = fs.readFileSync(`${__dirname}/${file}`).toString();
 
-    if (!content.includes(`REQUIRE`))
+    if (!content.includes(`ASSERT`))
         continue;
 
     content = content.replace(/^[ \t]*#.*/gm, ``);
     content = content.replace(/(TEST_CASE|SECTION)\((.*)\)$/gm, `testsuite.register($2).fn = (testsuite, env) =>`);
     content = content.replace(/FOR\(([^,]+),/g, `for (let $1 of `);
     content = content.replace(/([A-Z][A-Z_]*)\(/g, `env.$1(`);
-    content = content.replace(/==/g, `+''==''+`);
-    content = content.replace(/\b(layout|Position)\b/g, `env.$1`);
+    content = content.replace(/\b(layout|Position|PositionRet)\b/g, `env.$1`);
     content = content.replace(/([0-9])u/g, `$1`);
     content = content.replace(/\bauto\b/g, `let`);
 

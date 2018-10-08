@@ -7,8 +7,8 @@ TEST_CASE("stress test #1")
     for (auto t = 0u; t < 30; ++t)
         APPEND("Foo\n");
 
-    REQUIRE(LINE_COUNT() == 31);
-    REQUIRE(TEXT() == "Foo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\n");
+    ASSERT_EQ(LINE_COUNT(), 31);
+    ASSERT_EQ(TEXT(), "Foo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\nFoo\n");
 }
 
 TEST_CASE("stress test #2")
@@ -20,8 +20,8 @@ TEST_CASE("stress test #2")
         APPEND(" ");
     }
 
-    REQUIRE(LINE_COUNT() == 1);
-    REQUIRE(TEXT() == "a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a");
+    ASSERT_EQ(LINE_COUNT(), 1);
+    ASSERT_EQ(TEXT(), "a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a");
 }
 
 TEST_CASE("stress test #3")
@@ -39,8 +39,8 @@ TEST_CASE("stress test #3")
         APPEND(" ");
     }
 
-    REQUIRE(LINE_COUNT() == 6);
-    REQUIRE(TEXT() == "a  a a a a\na  a a a a\na  a a a a\na  a a a a\na  a a a a\na a a a a");
+    ASSERT_EQ(LINE_COUNT(), 6);
+    ASSERT_EQ(TEXT(), "a  a a a a\na  a a a a\na  a a a a\na  a a a a\na  a a a a\na a a a a");
 }
 
 TEST_CASE("stress test #4")
@@ -62,6 +62,6 @@ TEST_CASE("stress test #4")
         currentPosition = layout.getPositionForCharacterIndex(characterIndex + 1);
     }
 
-    REQUIRE(LINE_COUNT() == 12);
-    REQUIRE(TEXT() == "a  b c d e\nf  g h i j\nk  l m n o\np  q r s t\nu  v w x y\nz\nA  B C D E\nF  G H I J\nK  L M N O\nP  Q R S T\nU  V W X Y\nZ");
+    ASSERT_EQ(LINE_COUNT(), 12);
+    ASSERT_EQ(TEXT(), "a  b c d e\nf  g h i j\nk  l m n o\np  q r s t\nu  v w x y\nz\nA  B C D E\nF  G H I J\nK  L M N O\nP  Q R S T\nU  V W X Y\nZ");
 }

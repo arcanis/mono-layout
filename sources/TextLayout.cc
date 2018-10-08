@@ -1,8 +1,8 @@
 #include <cassert>
 
 #include <algorithm>
-#include <sstream>
 #include <string>
+#include <utility>
 
 #include "./Line.hh"
 #include "./TextLayout.hh"
@@ -292,7 +292,7 @@ Position TextLayout::getFixedPosition(Position position) const
     return position;
 }
 
-Position TextLayout::getPositionLeft(Position position) const
+std::pair<Position, bool> TextLayout::getPositionLeft(Position position) const
 {
     assert(m_lines.size() > 0);
     assert(position.y < m_lines.size());
@@ -344,10 +344,10 @@ Position TextLayout::getPositionLeft(Position position) const
 
     }
 
-    return position;
+    return { position, true };
 }
 
-Position TextLayout::getPositionRight(Position position) const
+std::pair<Position, bool> TextLayout::getPositionRight(Position position) const
 {
     assert(m_lines.size() > 0);
     assert(position.y < m_lines.size());
@@ -399,19 +399,27 @@ Position TextLayout::getPositionRight(Position position) const
 
     }
 
-    return position;
+    return { position, true };
 }
 
-Position TextLayout::getPositionAbove(Position position, unsigned amplitude) const
+std::pair<Position, bool> TextLayout::getPositionAbove(Position position) const
+{
+    return this->getPositionAbove(position, 1);
+}
+
+std::pair<Position, bool> TextLayout::getPositionAbove(Position position, unsigned amplitude) const
 {
     assert(m_lines.size() > 0);
     assert(position.y < m_lines.size());
 
+    bool perfectFit = true;
+
     if (amplitude == 0)
-        return position;
+        return { position, perfectFit };
 
     // if jumping with the requested amplitude would bring above the very first line, we just go to the beginning of the line (/!\ Careful to underflows /!\)
     if (amplitude > position.y) {
+
         position.y = 0;
         position.x = 0;
 
@@ -420,12 +428,16 @@ Position TextLayout::getPositionAbove(Position position, unsigned amplitude) con
 
         // if we land on the left edge of a line, short-circuit the rest of the procedure, since it will always be a valid positioning
         if (position.x == 0) {
-            return position;
+
+            return { position, perfectFit };
 
         // if we land on the right edge of the line or beyond, same old same old, we can short-circuit the rest of the procedure as long as we stay on the line
         } else if (position.x >= m_lines.at(position.y).outputLength) {
+
+            perfectFit = position.x == m_lines.at(position.y).outputLength;
             position.x = m_lines.at(position.y).outputLength;
-            return position;
+
+            return { position, perfectFit };
 
         // otherwise, we have to check the token on which we land, to make sure we stay outside if it can't be subdivided
         } else {
@@ -450,33 +462,46 @@ Position TextLayout::getPositionAbove(Position position, unsigned amplitude) con
 
     }
 
-    return position;
+    return { position, perfectFit };
 }
 
-Position TextLayout::getPositionBelow(Position position, unsigned amplitude) const
+std::pair<Position, bool> TextLayout::getPositionBelow(Position position) const
+{
+    return this->getPositionBelow(position, 1);
+}
+
+std::pair<Position, bool> TextLayout::getPositionBelow(Position position, unsigned amplitude) const
 {
     assert(m_lines.size() > 0);
     assert(position.y < m_lines.size());
 
+    bool perfectFit = true;
+
     if (amplitude == 0)
-        return position;
+        return { position, perfectFit };
 
     // if jumping with the requested amplitude would bring below the very last line, we just go to the end of the line (/!\ Careful to underflows /!\)
     if (amplitude > m_lines.size() - position.y - 1) {
+
         position.y = m_lines.size() - 1;
         position.x = m_lines.at(position.y).outputLength;
 
     } else {
+
         position.y += amplitude;
 
         // if we land on the left edge of a line, short-circuit the rest of the procedure, since it will always be a valid positioning
         if (position.x == 0) {
-            return position;
+
+            return { position, perfectFit };
 
         // if we land on the right edge of the line or beyond, same old same old, we can short-circuit the rest of the procedure as long as we stay on the line
         } else if (position.x >= m_lines.at(position.y).outputLength) {
+
+            perfectFit = position.x == m_lines.at(position.y).outputLength;
             position.x = m_lines.at(position.y).outputLength;
-            return position;
+
+            return { position, perfectFit };
 
         // otherwise, we have to check the token on which we land, to make sure we stay outside if it can't be subdivided
         } else {
@@ -501,7 +526,7 @@ Position TextLayout::getPositionBelow(Position position, unsigned amplitude) con
 
     }
 
-    return position;
+    return { position, perfectFit };
 }
 
 unsigned TextLayout::getRowForCharacterIndex(unsigned characterIndex) const
@@ -595,13 +620,18 @@ unsigned TextLayout::getCharacterIndexForPosition(Position position) const
     }
 }
 
-TextOperation TextLayout::clearSource(void)
+TextOperation TextLayout::applyConfiguration(void)
 {
     assert(m_lines.size() > 0);
 
     auto characterCount = m_source.size();
 
     return this->spliceSource(0, characterCount, m_source);
+}
+
+TextOperation TextLayout::clearSource(void)
+{
+    return this->setSource("");
 }
 
 TextOperation TextLayout::setSource(std::string const & source)

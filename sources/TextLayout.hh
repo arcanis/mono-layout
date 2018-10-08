@@ -1,7 +1,6 @@
 #pragma once
 
-#include <functional>
-#include <memory>
+#include <utility>
 #include <vector>
 
 #include "./LineSizeContainer.hh"
@@ -62,11 +61,14 @@ class TextLayout {
 
     Position getFixedPosition(Position position) const;
 
-    Position getPositionLeft(Position position) const;
-    Position getPositionRight(Position position) const;
+    std::pair<Position, bool> getPositionLeft(Position position) const;
+    std::pair<Position, bool> getPositionRight(Position position) const;
 
-    Position getPositionAbove(Position position, unsigned amplitude = 1) const;
-    Position getPositionBelow(Position position, unsigned amplitude = 1) const;
+    std::pair<Position, bool> getPositionAbove(Position position) const;
+    std::pair<Position, bool> getPositionAbove(Position position, unsigned amplitude) const;
+
+    std::pair<Position, bool> getPositionBelow(Position position) const;
+    std::pair<Position, bool> getPositionBelow(Position position, unsigned amplitude) const;
 
  public: // pointers conversions
 
@@ -77,6 +79,8 @@ class TextLayout {
     unsigned getCharacterIndexForPosition(Position position) const;
 
  public: // state mutators
+
+    TextOperation applyConfiguration(void);
 
     TextOperation clearSource(void);
     TextOperation setSource(std::string const & source);

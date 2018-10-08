@@ -28,7 +28,6 @@ struct Position {
 
 };
 
-
 #ifdef DEBUG
 
 inline static std::ostream & operator <<(std::ostream & os, Position const & position)

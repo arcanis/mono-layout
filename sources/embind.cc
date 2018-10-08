@@ -10,6 +10,10 @@ EMSCRIPTEN_BINDINGS(text_layout)
 
     register_vector<std::string>("std::vector<char>");
 
+    value_array<std::pair<Position, bool>>("std::pair<Position, bool>")
+        .element(&std::pair<Position, bool>::first)
+        .element(&std::pair<Position, bool>::second);
+
     value_object<TextOperation>("TextOperation")
         .field("startingRow", &TextOperation::startingRow)
         .field("deletedLineCount", &TextOperation::deletedLineCount)
@@ -56,14 +60,18 @@ EMSCRIPTEN_BINDINGS(text_layout)
         .function("getFixedPosition", &TextLayout::getFixedPosition)
         .function("getPositionLeft", &TextLayout::getPositionLeft)
         .function("getPositionRight", &TextLayout::getPositionRight)
-        .function("getPositionAbove", &TextLayout::getPositionAbove)
-        .function("getPositionBelow", &TextLayout::getPositionBelow)
+        .function("getPositionAbove", select_overload<std::pair<Position, bool> (Position) const>(&TextLayout::getPositionAbove))
+        .function("getPositionAbove", select_overload<std::pair<Position, bool> (Position, unsigned) const>(&TextLayout::getPositionAbove))
+        .function("getPositionBelow", select_overload<std::pair<Position, bool> (Position) const>(&TextLayout::getPositionBelow))
+        .function("getPositionBelow", select_overload<std::pair<Position, bool> (Position, unsigned) const>(&TextLayout::getPositionBelow))
 
         .function("getRowForCharacterIndex", &TextLayout::getRowForCharacterIndex)
         .function("getCharacterIndexForRow", &TextLayout::getCharacterIndexForRow)
 
         .function("getPositionForCharacterIndex", &TextLayout::getPositionForCharacterIndex)
         .function("getCharacterIndexForPosition", &TextLayout::getCharacterIndexForPosition)
+
+        .function("applyConfiguration", &TextLayout::applyConfiguration)
 
         .function("clearSource", &TextLayout::clearSource)
         .function("setSource", &TextLayout::setSource)
