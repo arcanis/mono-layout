@@ -14,7 +14,7 @@ RM		= rm -f
 CXX		?= clang++
 
 CXXFLAGS	= -std=c++14 -W -Wall -Werror -MMD -Isources/tests
-EMFLAGS		= -s ALLOW_MEMORY_GROWTH=1 --bind --pre-js ./sources/shell.pre.js --post-js ./sources/shell.post.js
+EMFLAGS		= --llvm-opts 3 --llvm-lto 1 -s SINGLE_FILE=1 -s ALLOW_MEMORY_GROWTH=1 --bind --pre-js ./sources/shell.pre.js --post-js ./sources/shell.post.js
 
 NODEPS		= clean fclean
 .PHONY		: all clean fclean re test

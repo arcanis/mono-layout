@@ -50,7 +50,7 @@ export interface TextLayout {
   getRowCount(): number;
   getColumnCount(): number;
   getSoftWrapCount(): number;
-  getMaxCharacterCount(): number;
+  getMaxCharacterIndex(): number;
 
   getFirstPosition(): Position;
   getLastPosition(): Position;

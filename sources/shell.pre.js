@@ -1,10 +1,8 @@
 let setup = false;
 
-module.exports = (wasmBinary, readyCallback) => {
+module.exports = (readyCallback) => {
   if (setup) return Module;
   setup = true;
-
-  Module.wasmBinary = wasmBinary;
 
   Module.onRuntimeInitialized = () => {
     Module.applyPatch = (textLayout, patch, targetArray) => {
