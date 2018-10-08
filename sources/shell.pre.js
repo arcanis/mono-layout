@@ -17,7 +17,7 @@ module.exports = (readyCallback) => {
       targetArray.splice(patch.startingRow, patch.deletedLineCount, ... strings);
     };
 
-    Module.TextLayout.prototype.setConfiguration = config => {
+    Module.TextLayout.prototype.setConfiguration = function (config) {
       let mustUpdate = false;
 
       for (const key of Object.keys(config)) {
