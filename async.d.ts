@@ -1,4 +1,5 @@
 import {TextLayoutStruct} from './common';
 export *                  from './common';
 
-export = Promise<TextLayoutStruct>();
+declare const enginePromise: Promise<TextLayoutStruct>;
+export default enginePromise;

@@ -1,9 +1,13 @@
 {
-  "name": "@manaflair/text-layout",
-  "version": "0.11.0",
+  "name": "mono-layout",
+  "version": "0.11.1",
   "license": "MIT",
   "main": "./async.js",
-  "typings": "./async.d.ts",
+  "types": "./async.d.ts",
+  "exports": {
+    ".": "./async.js",
+    "./sync": "./sync.js"
+  },
   "devDependencies": {
     "@manaflair/term-strings": "^0.10.0",
     "faker": "^4.1.0",

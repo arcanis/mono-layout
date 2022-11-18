@@ -1,10 +1,8 @@
-# [![Text-Layout](/logo.png?raw=true)](https://github.com/manaflair/text-layout)
+# [![Mono-Layout](/logo.png?raw=true)](https://github.com/arcanis/mono-layout)
 
 > Fast implementation of a browser-like text layout engine, for Node and browsers
 
-[![](https://img.shields.io/npm/v/@manaflair/text-layout.svg)]() [![](https://img.shields.io/npm/l/@manaflair/text-layout.svg)]()
-
-[Check out our other OSS projects!](https://manaflair.github.io)
+[![](https://img.shields.io/npm/v/mono-layout.svg)]() [![](https://img.shields.io/npm/l/mono-layout.svg)]()
 
 ## Features
 
@@ -24,13 +22,13 @@ Currently not implemented:
 ## Installation
 
 ```
-$> yarn add @manaflair/text-layout
+$> yarn add mono-layout
 ```
 
 ## Usage
 
 ```js
-const {TextLayout} = require(`@manaflair/text-layout/sync`);
+const {TextLayout} = require(`mono-layout/sync`);
 const faker = require(`faker`);
 
 const textLayout = new TextLayout();
@@ -40,10 +38,10 @@ textLayout.setSource(faker.lorem.paragraphs(10, `\n\n`));
 console.log(textLayout.getTransformedSource());
 ```
 
-Note that the library is also available through an asynchronous endpoint (used by default when requiring `@manaflair/text-layout`). You typically will want to use this endpoint if your code is expected to work within browsers, since they may disallow WebAssembly to be compiled in the main thread. Here's what the code looks like with the asynchronous initialization:
+Note that the library is also available through an asynchronous endpoint (used by default when requiring `mono-layout`). You typically will want to use this endpoint if your code is expected to work within browsers, since they may disallow WebAssembly to be compiled in the main thread. Here's what the code looks like with the asynchronous initialization:
 
 ```js
-const tlPromise = require(`@manaflair/text-layout/async`);
+const tlPromise = require(`mono-layout/async`);
 const faker = require(`faker`);
 
 tlPromise.then(({TextLayout}) => {
@@ -73,7 +71,7 @@ $> node sources/run-tests.js
 
 ## License (MIT)
 
-> **Copyright © 2016 Maël Nison & Manaflair**
+> **Copyright © 2016 Maël Nison**
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
