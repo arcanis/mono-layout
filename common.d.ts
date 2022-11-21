@@ -22,7 +22,7 @@ export type TextOperation = {
   addedLineCount: number,
 };
 
-export interface TextLayout {
+export class TextLayout {
   getColumns(): number;
   getTabWidth(): number;
 
@@ -61,6 +61,7 @@ export interface TextLayout {
   getText(): string;
   getLine(row: number): string;
 
+  getFixedCellPosition(position: Position): Position;
   getFixedPosition(position: Position): Position;
 
   getPositionLeft(position: Position): [Position, boolean];
@@ -82,11 +83,8 @@ export interface TextLayout {
   [Symbol.iterator](): IterableIterator<string>;
 }
 
-export interface TextLayoutConstructor {
-  new(): TextLayout;
-}
-
-export type TextLayoutStruct = {
-  TextLayout: TextLayoutConstructor,
-  applyPatch: (textLayout: TextLayout, patch: TextOperation, destination: Array<string>) => void,
-};
+export function applyPatch(
+  textLayout: TextLayout,
+  patch: TextOperation,
+  destination: Array<string>,
+): void;

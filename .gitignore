@@ -1,3 +1,5 @@
+.yarn
+.pnp.*
 node_modules
 *.a
 *.o
@@ -6,6 +8,4 @@ node_modules
 *.gypi
 !/final-flags.gypi
 
-/build
-
-npm-debug.log*
+/lib

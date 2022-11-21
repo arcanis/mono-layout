@@ -57,6 +57,7 @@ EMSCRIPTEN_BINDINGS(text_layout)
         .function("getText", &TextLayout::getText)
         .function("getLine", &TextLayout::getLine)
 
+        .function("getFixedCellPosition", &TextLayout::getFixedCellPosition)
         .function("getFixedPosition", &TextLayout::getFixedPosition)
         .function("getPositionLeft", &TextLayout::getPositionLeft)
         .function("getPositionRight", &TextLayout::getPositionRight)

@@ -261,12 +261,19 @@ TokenLocator TextLayout::findTokenLocatorForPosition(Position const & position) 
     return TokenLocator(position.y, tokenIndex, line, token);
 }
 
-Position TextLayout::getFixedPosition(Position position) const
+Position TextLayout::getFixedCellPosition(Position position) const
 {
     assert(m_lines.size() > 0);
 
     position.y = std::min(position.y, static_cast<unsigned>(m_lines.size() - 1));
     position.x = std::min(position.x, m_lines.at(position.y).outputLength);
+
+    return position;
+}
+
+Position TextLayout::getFixedPosition(Position position) const
+{
+    position = this->getFixedCellPosition(position);
 
     auto const & line = m_lines.at(position.y);
 

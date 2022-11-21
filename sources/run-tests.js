@@ -1,5 +1,5 @@
-let ts = require(`@manaflair/term-strings`);
 let fs = require(`fs`);
+let ts = require(`term-strings`);
 let glob = require(`glob`);
 let vm = require(`vm`);
 

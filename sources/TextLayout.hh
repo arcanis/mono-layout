@@ -59,6 +59,7 @@ class TextLayout {
 
  public: // cursor management
 
+    Position getFixedCellPosition(Position position) const;
     Position getFixedPosition(Position position) const;
 
     std::pair<Position, bool> getPositionLeft(Position position) const;

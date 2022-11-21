@@ -2,8 +2,8 @@ SHELL		= bash
 
 TARGET		= libtformat.a
 
-SRC			= $(shell find sources -name '*.cc' -a -not -name '*.test.cc' -a -not -name 'embind.cc')
-TESTS		= $(shell find sources -name '*.test.cc' -a -not -name 'nbind.cc')
+SRC			= $(shell find sources -name '*.cc' -not -name 'embind.cc' -not -path 'sources/tests/*')
+TESTS		= $(shell find sources -name '*.cc' -not -name 'embind.cc')
 
 OBJ_SRC		= $(SRC:%.cc=%.o)
 OBJ_TESTS	= $(TESTS:%.cc=%.o)
@@ -34,7 +34,7 @@ clean:
 	$(RM) $(shell find . -name '*.o')
 	$(RM) $(shell find . -name '*.d')
 
-webassembly: $(SRC)
+wasm: $(SRC)
 	mkdir -p lib
 	em++ $(CXXFLAGS) $(CPPFLAGS) $(EMFLAGS) -s BINARYEN_ASYNC_COMPILATION=1 -o lib/text-layout.js $(SRC) sources/embind.cc
 	em++ $(CXXFLAGS) $(CPPFLAGS) $(EMFLAGS) -s BINARYEN_ASYNC_COMPILATION=0 -o lib/text-layout-sync.js $(SRC) sources/embind.cc
@@ -45,12 +45,12 @@ fclean: clean
 re:	clean
 	$(MAKE) all
 
-test: $(OBJ_SRC) $(OBJ_TESTS)
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o /tmp/testsuite $(OBJ_SRC) $(OBJ_TESTS)
+test: $(OBJ_TESTS)
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o /tmp/testsuite $(OBJ_TESTS)
 	/tmp/testsuite
 
 $(TARGET): $(OBJ_SRC)
 	ar r $(TARGET) $(OBJ_SRC)
 	ranlib $(TARGET)
 
-.PHONY: all clean webassembly fclean re test
+.PHONY: all clean wasm fclean re test
