@@ -1,13 +1,13 @@
 {
   "name": "mono-layout",
-  "version": "0.11.2",
+  "version": "0.12.0",
   "packageManager": "yarn@4.0.0-rc.30",
   "license": "MIT",
-  "main": "./async.js",
-  "types": "./async.d.ts",
   "exports": {
-    ".": "./async.js",
-    "./sync": "./sync.js"
+    ".": "./entry/async.js",
+    "./sync": "./entry/sync.js",
+    "./async": "./entry/async.js",
+    "./wasm": "./lib/mono-layout.wasm"
   },
   "devDependencies": {
     "faker": "^4.1.0",
@@ -16,5 +16,9 @@
   },
   "scripts": {
     "prepack": "make wasm"
-  }
+  },
+  "files": [
+    "entry",
+    "lib"
+  ]
 }

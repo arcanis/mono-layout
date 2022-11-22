@@ -1,28 +1,32 @@
 export type Configuration = {
-  columns: number,
-  tabWidth: number,
+  columns: number;
+  tabWidth: number;
 
-  softWrap: boolean,
-  collapseWhitespaces: boolean,
-  preserveLeadingSpaces: boolean,
-  preserveTrailingSpaces: boolean,
-  allowWordBreaks: boolean,
-  demoteNewlines: boolean,
-  justifyText: boolean,
+  softWrap: boolean;
+  collapseWhitespaces: boolean;
+  preserveLeadingSpaces: boolean;
+  preserveTrailingSpaces: boolean;
+  allowWordBreaks: boolean;
+  demoteNewlines: boolean;
+  justifyText: boolean;
 };
 
 export type Position = {
-  x: number,
-  y: number,
+  x: number;
+  y: number;
 };
 
 export type TextOperation = {
-  startingRow: number,
-  deletedLineCount: number,
-  addedLineCount: number,
+  startingRow: number;
+  deletedLineCount: number;
+  addedLineCount: number;
 };
 
-export class TextLayout {
+export interface Context {
+  createLayout(): TextLayout;
+}
+
+export interface TextLayout {
   getColumns(): number;
   getTabWidth(): number;
 
@@ -82,9 +86,3 @@ export class TextLayout {
 
   [Symbol.iterator](): IterableIterator<string>;
 }
-
-export function applyPatch(
-  textLayout: TextLayout,
-  patch: TextOperation,
-  destination: Array<string>,
-): void;
