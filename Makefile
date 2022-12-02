@@ -29,6 +29,7 @@ EMFLAGS		+= 									\
 	-s MODULARIZE=1 							\
 	-s ERROR_ON_UNDEFINED_SYMBOLS=0 			\
 	-s FILESYSTEM=0 							\
+	-s ENVIRONMENT=web							\
 	-s MALLOC="emmalloc" 						\
 	-s INCOMING_MODULE_JS_API=['wasmBinary'] 	\
 	-s EXPORT_NAME="monoLayout"

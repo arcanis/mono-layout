@@ -1,6 +1,6 @@
 {
   "name": "mono-layout",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "packageManager": "yarn@4.0.0-rc.30",
   "license": "MIT",
   "exports": {
