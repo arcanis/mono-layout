@@ -64,6 +64,8 @@ export interface TextLayout {
   getSource(): string;
   getText(): string;
   getLine(row: number): string;
+  getLineLength(row: number): number;
+  getLineSlice(row: number, start: number, end: number): string;
 
   getFixedCellPosition(position: Position): Position;
   getFixedPosition(position: Position): Position;

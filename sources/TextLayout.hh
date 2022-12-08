@@ -56,6 +56,8 @@ class TextLayout {
     std::string const & getSource(void) const;
     std::string getText(void) const;
     std::string const & getLine(unsigned row) const;
+    unsigned getLineLength(unsigned row) const;
+    std::string getLineSlice(unsigned row, unsigned start, unsigned end) const;
 
  public: // cursor management
 

@@ -56,6 +56,8 @@ EMSCRIPTEN_BINDINGS(text_layout)
         .function("getSource", &TextLayout::getSource)
         .function("getText", &TextLayout::getText)
         .function("getLine", &TextLayout::getLine)
+        .function("getLineLength", &TextLayout::getLineLength)
+        .function("getLineSlice", &TextLayout::getLineSlice)
 
         .function("getFixedCellPosition", &TextLayout::getFixedCellPosition)
         .function("getFixedPosition", &TextLayout::getFixedPosition)

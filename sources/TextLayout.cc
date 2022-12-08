@@ -240,6 +240,20 @@ std::string const & TextLayout::getLine(unsigned row) const
     return m_lines.at(row).string;
 }
 
+unsigned TextLayout::getLineLength(unsigned row) const
+{
+    assert(row < m_lines.size());
+
+    return m_lines.at(row).string.size();
+}
+
+std::string TextLayout::getLineSlice(unsigned row, unsigned start, unsigned end) const
+{
+    assert(row < m_lines.size());
+
+    return m_lines.at(row).string.substr(start, end - start);
+}
+
 TokenLocator TextLayout::findTokenLocatorForPosition(Position const & position) const
 {
     assert(position.y < m_lines.size());
