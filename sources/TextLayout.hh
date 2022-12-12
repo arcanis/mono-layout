@@ -87,7 +87,6 @@ class TextLayout {
     TextOperation applyConfiguration(void);
 
     TextOperation clearSource(void);
-    int setUtf8Source(std::string const & source);
     TextOperation setSource(std::string const & source);
     TextOperation spliceSource(unsigned start, unsigned deleted, std::string const & source);
 

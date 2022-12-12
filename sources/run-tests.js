@@ -88,6 +88,12 @@ function makeEnv() {
 
     }
 
+    function SET_SOURCE(newStr) {
+        
+        APPLY(layout.setSource(newStr));
+
+    }
+
     function SPLICE(start, length, replacement) {
 
         APPLY(layout.spliceSource(start, length, replacement));
@@ -132,7 +138,7 @@ function makeEnv() {
 
     }
 
-    return { layout, SETUP_EMPTY, SETUP, RESET, SPLICE, APPEND, LINE_COUNT, LINE_SLICE, TEXT, REQUIRE, ASSERT_EQ, Position: (x, y) => ({x, y}), PositionRet: (x, y, perfectFit) => [{x, y}, perfectFit] };
+    return { layout, SETUP_EMPTY, SETUP, RESET, SET_SOURCE, SPLICE, APPEND, LINE_COUNT, LINE_SLICE, TEXT, REQUIRE, ASSERT_EQ, Position: (x, y) => ({x, y}), PositionRet: (x, y, perfectFit) => [{x, y}, perfectFit] };
 
 }
 

@@ -656,12 +656,6 @@ TextOperation TextLayout::clearSource(void)
     return this->setSource("");
 }
 
-int TextLayout::setUtf8Source(std::string const & source) {
-    auto view = uni::views::grapheme::utf8(source);
-
-    return std::distance(view.begin(), view.end());
-}
-
 TextOperation TextLayout::setSource(std::string const & source)
 {
     assert(m_lines.size() > 0);

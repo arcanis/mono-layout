@@ -40,6 +40,11 @@
     output.apply(layout.applyConfiguration()); \
 }                                              \
 
+#define SET_SOURCE(SOURCE)                  \
+({                                          \
+    output.apply(layout.setSource(SOURCE)); \
+})                                          \
+
 #define LINE_SLICE(ROW, START, END)       \
 ({                                        \
     layout.getLineSlice(ROW, START, END); \

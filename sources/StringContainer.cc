@@ -5,6 +5,7 @@
 
 StringContainer & StringContainer::operator=(std::string const & value)
 {
+    m_internalRepresentation.clear();
     m_internalRepresentation.reserve(value.size());
 
     for (auto c : uni::views::grapheme::utf8(value))

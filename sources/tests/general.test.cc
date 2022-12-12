@@ -24,6 +24,15 @@ TEST_CASE("it should correctly parse multiple lines")
     ASSERT_EQ(TEXT(), "Hello\nWorld");
 }
 
+TEST_CASE("it should allow replacing a text by another")
+{
+    SETUP("Hello World");
+    SET_SOURCE("Something different");
+
+    ASSERT_EQ(LINE_COUNT(), 1);
+    ASSERT_EQ(TEXT(), "Something different");
+}
+
 TEST_CASE("it should support ending a text with a newline character")
 {
     SETUP("Hello World\n");
