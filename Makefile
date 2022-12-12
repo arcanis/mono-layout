@@ -34,10 +34,6 @@ EMFLAGS		+= 									\
 	-s INCOMING_MODULE_JS_API=['wasmBinary'] 	\
 	-s EXPORT_NAME="monoLayout"
 
-ifeq (0, $(words $(findstring $(MAKECMDGOALS), $(NODEPS))))
--include $(DEPS)
-endif
-
 ifeq ($(DEBUG),1)
 CXXFLAGS	+= -g -O0
 CPPFLAGS	+= -DDEBUG
@@ -46,6 +42,10 @@ CXXFLAGS	+= -O3
 endif
 
 all: $(TARGET)
+
+ifeq (0, $(words $(findstring $(MAKECMDGOALS), $(NODEPS))))
+-include $(DEPS)
+endif
 
 clean:
 	$(RM) $(shell find . -name '*.o')
@@ -65,10 +65,10 @@ re:	clean
 	$(MAKE) all
 
 %.cc.o: %.cc
-	${CXX} ${CPPFLAGS} ${CXXFLAGS} -c -o $@ $^
+	${CXX} ${CPPFLAGS} ${CXXFLAGS} -c -o $@ $<
 
 %.cpp.o: %.cpp
-	${CXX} ${CPPFLAGS} ${CXXFLAGS} -c -o $@ $^
+	${CXX} ${CPPFLAGS} ${CXXFLAGS} -c -o $@ $<
 
 $(TARGET): $(OBJ_SRC)
 	ar r $(TARGET) $(OBJ_SRC)

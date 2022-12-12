@@ -219,7 +219,7 @@ bool TextLayout::doesSoftWrap(unsigned row) const
     return m_lines.at(row).doesSoftWrap;
 }
 
-std::string const & TextLayout::getSource(void) const
+std::string TextLayout::getSource(void) const
 {
     return m_source.toString();
 }
@@ -236,7 +236,7 @@ std::string TextLayout::getText(void) const
     return str;
 }
 
-std::string const & TextLayout::getLine(unsigned row) const
+std::string TextLayout::getLine(unsigned row) const
 {
     assert(row < m_lines.size());
 
@@ -686,17 +686,20 @@ TextOperation TextLayout::spliceSource(unsigned start, unsigned removed, std::st
 
 TextOperation TextLayout::update(unsigned start, unsigned removed, unsigned added)
 {
+    auto errorCharacter = GraphemeContainer("?");
+    auto spaceCharacter = GraphemeContainer(" ");
+
     #define GET_CHARACTER_COUNT() m_source.size()
     #define GET_CHARACTER(OFFSET) m_source.at(OFFSET)
 
-    #define SET_OFFSET(OFFSET) do { offset = (OFFSET); offsetChar = offset < offsetMax ? GET_CHARACTER(offset) : '?'; } while (0)
+    #define SET_OFFSET(OFFSET) do { offset = (OFFSET); offsetChar = offset < offsetMax ? GET_CHARACTER(offset) : errorCharacter; } while (0)
 
-    #define IS_NEWLINE() (!IS_END_OF_FILE() && !m_demoteNewlines && (offsetChar == '\r' || offsetChar == '\n'))
-    #define IS_WHITESPACE() (!IS_END_OF_FILE() && (offsetChar == ' ' || offsetChar == '\t' || (m_demoteNewlines && (offsetChar == '\r' || offsetChar == '\n'))))
+    #define IS_NEWLINE() (!IS_END_OF_FILE() && !m_demoteNewlines && (*offsetChar == '\r' || *offsetChar == '\n'))
+    #define IS_WHITESPACE() (!IS_END_OF_FILE() && (*offsetChar == ' ' || *offsetChar == '\t' || (m_demoteNewlines && (*offsetChar == '\r' || *offsetChar == '\n'))))
     #define IS_WORD() (!IS_END_OF_FILE() && !IS_WHITESPACE() && !IS_NEWLINE())
 
     #define SHIFT_CHARACTER() ({ auto c = offsetChar; SET_OFFSET(offset + 1); c; })
-    #define SHIFT_WHILE(COND, MAX) ({ std::string output; while (output.size() < MAX && COND) output += SHIFT_CHARACTER(); output; })
+    #define SHIFT_WHILE(COND, MAX) ({ StringContainer output; while (output.size() < MAX && COND) output += SHIFT_CHARACTER(); output; })
 
     #define SHIFT_WHITESPACES() SHIFT_WHILE(IS_WHITESPACE(), static_cast<unsigned>(-1))
     #define SHIFT_WORD() SHIFT_WHILE(IS_WORD(), static_cast<unsigned>(-1))
@@ -728,7 +731,7 @@ TextOperation TextLayout::update(unsigned start, unsigned removed, unsigned adde
 
     // Create a temporary local buffer, so that we don't need to call getCharacter() & getCharacterCount() more than needed (which might get expensive, especially when crossing asmjs boundaries).
     auto offsetMax = GET_CHARACTER_COUNT();
-    auto offsetChar = offset < offsetMax ? GET_CHARACTER(offset) : '?';
+    auto offsetChar = offset < offsetMax ? GET_CHARACTER(offset) : errorCharacter;
 
     // Also compute a tentative position where to stop the formatting process. It will be increased later if our newly generated lines invalidate their successors.
     // the +1 is required so that we actually iterate even when the very last line is empty (for example with "Foobar\n" or even "" - without this extra increment, we wouldn't create the very last empty line)
@@ -813,13 +816,13 @@ TextOperation TextLayout::update(unsigned start, unsigned removed, unsigned adde
                     Token token = NEW_TOKEN(TOKEN_WHITESPACES);
                     token.canBeSubdivided = true;
 
-                    for (auto c : SHIFT_WHITESPACES_UNTIL(effectiveColumns - currentLine.outputLength)) switch (c) {
+                    for (auto c : SHIFT_WHITESPACES_UNTIL(effectiveColumns - currentLine.outputLength)) switch (*c) {
 
                         case '\r':
                         case '\n':
                         case ' ': {
 
-                            token.string += ' ';
+                            token.string += spaceCharacter;
 
                             token.inputLength += 1;
                             token.outputLength += 1;
@@ -841,7 +844,7 @@ TextOperation TextLayout::update(unsigned start, unsigned removed, unsigned adde
 
                             }
 
-                            token.string += std::string(m_tabWidth, ' ');
+                            token.string += GraphemeContainer(std::string(m_tabWidth, ' '));
 
                             token.inputLength += 1;
                             token.outputLength += m_tabWidth;
@@ -1000,7 +1003,7 @@ TextOperation TextLayout::update(unsigned start, unsigned removed, unsigned adde
                         token.canBeSubdivided = false;
 
                         token.outputLength += localSpaceCount;
-                        token.string += std::string(localSpaceCount, ' ');
+                        token.string += GraphemeContainer(std::string(localSpaceCount, ' '));
 
                         extraSpaceCount += localSpaceCount;
                         missingSpaceCount -= localSpaceCount;
@@ -1109,7 +1112,7 @@ void TextLayout::dump(std::vector<Line> const & lines) const
                 << "        inputLength  = " << token.inputLength << std::endl
                 << "        outputOffset = " << token.outputOffset << std::endl
                 << "        outputLength = " << token.outputLength << std::endl
-                << "        string       = '" << token.string << "'" << std::endl
+                << "        string       = '" << token.string.toString() << "'" << std::endl
             ;
 
         }

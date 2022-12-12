@@ -1,6 +1,41 @@
 #pragma once
 
 #include <string>
+#include <vector>
+
+#include "uni_algo/break_grapheme.h"
+
+class GraphemeContainer {
+
+ public:
+
+    GraphemeContainer(std::string view)
+    : m_view(view)
+    {
+    }
+
+ public:
+
+    size_t size() const
+    {
+        return m_view.size();
+    }
+
+    char operator*() const
+    {
+        return m_view.at(0);
+    }
+
+    std::string view() const
+    {
+        return m_view;
+    }
+
+ private:
+
+    std::string m_view;
+
+};
 
 class StringContainer {
 
@@ -12,64 +47,58 @@ class StringContainer {
     }
 
     StringContainer(std::string const & str)
-    : m_internalRepresentation(str)
+    : m_internalRepresentation()
     {
+        *this = str;
     }
 
  public:
-    StringContainer & operator=(std::string const & value)
-    {
-        m_internalRepresentation = value;
 
-        return *this;
+    auto begin() const
+    {
+        return m_internalRepresentation.begin();
     }
 
-    StringContainer & operator+=(StringContainer const & other)
+    auto end() const
     {
-        m_internalRepresentation += other.m_internalRepresentation;
-
-        return *this;
+        return m_internalRepresentation.end();
     }
 
-    StringContainer & operator+=(char c)
-    {
-        m_internalRepresentation += c;
+ public:
 
-        return *this;
-    }
+    GraphemeContainer const & at(unsigned offset) const;
 
-    char at(unsigned offset)
-    {
-        return m_internalRepresentation.at(offset);
-    }
+    size_t size() const;
 
-    void splice(unsigned start, unsigned removed, std::string const & added)
-    {
-        m_internalRepresentation = m_internalRepresentation.substr(0, start) + added + m_internalRepresentation.substr(start + removed);
-    }
+ public:
 
-    size_t size() const
-    {
-        return m_internalRepresentation.size();
-    }
+    StringContainer & operator=(std::string const & value);
 
-    StringContainer substr(unsigned start, unsigned end)
-    {
-        return m_internalRepresentation.substr(start, end);
-    }
+    StringContainer & operator+=(StringContainer const & other);
+    StringContainer & operator+=(GraphemeContainer const & c);
 
-    StringContainer substr(unsigned start)
-    {
-        return m_internalRepresentation.substr(start);
-    }
+    void splice(unsigned start, unsigned removed, std::string const & added);
 
-    std::string const & toString() const
+    StringContainer substr(unsigned start, unsigned end) const;
+    StringContainer substr(unsigned start) const;
+
+    std::string toString() const
     {
-        return m_internalRepresentation;
+        std::string finalString;
+
+        unsigned size = 0;
+        for (auto & c : m_internalRepresentation)
+            size += c.size();
+
+        finalString.reserve(size);
+        for (auto & c : m_internalRepresentation)
+            finalString += c.view();
+
+        return finalString;
     }
 
  private:
 
-    std::string m_internalRepresentation;
+    std::vector<GraphemeContainer> m_internalRepresentation;
 
 };

@@ -1,12 +1,15 @@
-let fs = require(`fs`);
-let ts = require(`term-strings`);
-let glob = require(`glob`);
-let vm = require(`vm`);
+const fs = require(`fs`);
+const ts = require(`term-strings`);
+const glob = require(`glob`);
+const vm = require(`vm`);
 
-let bindings = require(`../sync`);
+const wasm = fs.readFileSync(require.resolve(`mono-layout/wasm`));
 
-let ok = `${ts.style.color.front(`green`).in}✓${ts.style.color.front.out}`;
-let ko = `${ts.style.color.front(`red`).in}✗${ts.style.color.front.out}`;
+const {createContext} = require(`mono-layout/sync`);
+const {createLayout} = createContext(wasm);
+
+const ok = `${ts.style.color.front(`green`)}✓${ts.style.color.front.out}`;
+const ko = `${ts.style.color.front(`red`)}✗${ts.style.color.front.out}`;
 
 class TestSuite {
 
@@ -40,7 +43,7 @@ class TestSuite {
                 test.fn(testsuite, makeEnv());
                 console.log(`${indent} ${ok} ${test.label}`);
             } catch (err) {
-                console.log(`${indent} ${ko} ${test.label} (${err.stack || err})`);
+                console.log(`${indent} ${ko} ${test.label} (${err.message || err})`);
             }
 
             testsuite.run(level + 1);
@@ -57,13 +60,13 @@ class TestSuite {
 
 function makeEnv() {
 
-    let layout = new bindings.TextLayout();
+    let layout = createLayout();
 
     let otp = [ '' ];
 
     function APPLY(patch) {
 
-        bindings.applyPatch(layout, patch, otp);
+        otp.splice(patch.startingRow, patch.deletedLineCount, ...Array.from({length: patch.addedLineCount}, (_, n) => layout.getLine(patch.startingRow + n)));
 
     }
 
@@ -109,17 +112,17 @@ function makeEnv() {
 
     }
 
-    function REQUIRE(condition) {
+    function REQUIRE(condition, msg = `Assertion failed!`) {
 
         if (!condition) {
-            throw new Error(`Assertion failed!`);
+            throw new Error(msg);
         }
 
     }
 
     function ASSERT_EQ(left, right) {
 
-        REQUIRE(JSON.stringify(left) === JSON.stringify(right));
+        REQUIRE(JSON.stringify(left) === JSON.stringify(right), `${JSON.stringify(left)} == ${JSON.stringify(right)}`);
 
     }
 
