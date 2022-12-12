@@ -52,15 +52,15 @@ size_t StringContainer::size() const
     return m_internalRepresentation.size();
 }
 
-StringContainer StringContainer::substr(unsigned start, unsigned end) const
+StringContainer StringContainer::slice(unsigned start, unsigned end) const
 {
     StringContainer copy;
-    copy.m_internalRepresentation.insert(copy.m_internalRepresentation.end(), m_internalRepresentation.begin() + start, m_internalRepresentation.end() + end);
+    copy.m_internalRepresentation.insert(copy.m_internalRepresentation.end(), m_internalRepresentation.begin() + start, m_internalRepresentation.begin() + end);
 
     return copy;
 }
 
-StringContainer StringContainer::substr(unsigned start) const
+StringContainer StringContainer::slice(unsigned start) const
 {
     StringContainer copy;
     copy.m_internalRepresentation.insert(copy.m_internalRepresentation.end(), m_internalRepresentation.begin() + start, m_internalRepresentation.end());

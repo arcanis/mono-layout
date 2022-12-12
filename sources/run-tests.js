@@ -112,6 +112,12 @@ function makeEnv() {
 
     }
 
+    function LINE_SLICE(row, start, end) {
+
+        return layout.getLineSlice(row, start, end);
+
+    }
+
     function REQUIRE(condition, msg = `Assertion failed!`) {
 
         if (!condition) {
@@ -126,7 +132,7 @@ function makeEnv() {
 
     }
 
-    return { layout, SETUP_EMPTY, SETUP, RESET, SPLICE, APPEND, LINE_COUNT, TEXT, REQUIRE, ASSERT_EQ, Position: (x, y) => ({x, y}), PositionRet: (x, y, perfectFit) => [{x, y}, perfectFit] };
+    return { layout, SETUP_EMPTY, SETUP, RESET, SPLICE, APPEND, LINE_COUNT, LINE_SLICE, TEXT, REQUIRE, ASSERT_EQ, Position: (x, y) => ({x, y}), PositionRet: (x, y, perfectFit) => [{x, y}, perfectFit] };
 
 }
 

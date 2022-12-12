@@ -40,6 +40,11 @@
     output.apply(layout.applyConfiguration()); \
 }                                              \
 
+#define LINE_SLICE(ROW, START, END)       \
+({                                        \
+    layout.getLineSlice(ROW, START, END); \
+})                                        \
+
 #define TEXT()        \
 ({                    \
     output.getText(); \

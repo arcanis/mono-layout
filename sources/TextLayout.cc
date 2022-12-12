@@ -254,7 +254,7 @@ std::string TextLayout::getLineSlice(unsigned row, unsigned start, unsigned end)
 {
     assert(row < m_lines.size());
 
-    return m_lines.at(row).string.toString().substr(start, end - start);
+    return m_lines.at(row).string.slice(start, end).toString();
 }
 
 TokenLocator TextLayout::findTokenLocatorForPosition(Position const & position) const

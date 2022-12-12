@@ -66,6 +66,9 @@ class StringContainer {
 
  public:
 
+    StringContainer slice(unsigned start, unsigned end) const;
+    StringContainer slice(unsigned start) const;
+
     GraphemeContainer const & at(unsigned offset) const;
 
     size_t size() const;
@@ -78,9 +81,6 @@ class StringContainer {
     StringContainer & operator+=(GraphemeContainer const & c);
 
     void splice(unsigned start, unsigned removed, std::string const & added);
-
-    StringContainer substr(unsigned start, unsigned end) const;
-    StringContainer substr(unsigned start) const;
 
     std::string toString() const
     {
