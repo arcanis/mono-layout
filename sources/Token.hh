@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "./StringContainer.hh"
+
 enum TokenType {
 
     TOKEN_DYNAMIC,
@@ -22,7 +24,7 @@ struct Token {
 
     bool canBeSubdivided;
 
-    std::string string;
+    StringContainer string;
 
     Token(void)
     : type(TOKEN_DYNAMIC)

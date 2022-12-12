@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "./StringContainer.hh"
 #include "./Token.hh"
 
 struct Line {
@@ -18,7 +19,7 @@ struct Line {
     bool hasNewline;
 
     std::vector<Token> tokens;
-    std::string string;
+    StringContainer string;
 
     Line(void)
     : inputOffset(0)

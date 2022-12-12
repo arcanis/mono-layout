@@ -6,6 +6,7 @@
 #include "./LineSizeContainer.hh"
 #include "./Line.hh"
 #include "./Position.hh"
+#include "./StringContainer.hh"
 #include "./TextOperation.hh"
 #include "./TokenLocator.hh"
 
@@ -86,8 +87,9 @@ class TextLayout {
     TextOperation applyConfiguration(void);
 
     TextOperation clearSource(void);
+    int setUtf8Source(std::string const & source);
     TextOperation setSource(std::string const & source);
-    TextOperation spliceSource(unsigned start, unsigned deleted, std::string const & added);
+    TextOperation spliceSource(unsigned start, unsigned deleted, std::string const & source);
 
 #ifdef DEBUG
 
@@ -100,6 +102,7 @@ class TextLayout {
 
  private:
 
+    TextOperation update(unsigned start, unsigned deleted, unsigned added);
     void apply(TextOperation const & textOperation);
 
  private:
@@ -119,7 +122,7 @@ class TextLayout {
     bool m_demoteNewlines;
     bool m_justifyText;
 
-    std::string m_source;
+    StringContainer m_source;
 
     LineSizeContainer m_lineSizeContainer;
     unsigned m_softWrapCount;

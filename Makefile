@@ -2,18 +2,18 @@ SHELL		= bash
 
 TARGET		= libtformat.a
 
-SRC			= $(shell find sources -name '*.cc' -not -name 'embind.cc' -not -path 'sources/tests/*')
-TESTS		= $(shell find sources -name '*.cc' -not -name 'embind.cc')
+SRC			= $(shell find sources -name '*.cc' -not -name 'embind.cc' -not -path 'sources/tests/*') uni-algo/src/data.cpp
+TESTS		= $(shell find sources -name '*.cc' -not -name 'embind.cc') uni-algo/src/data.cpp
 
-OBJ_SRC		= $(SRC:%.cc=%.o)
-OBJ_TESTS	= $(TESTS:%.cc=%.o)
+OBJ_SRC		= $(SRC:=.o)
+OBJ_TESTS	= $(TESTS:=.o)
 
-DEPS		= $(SRC:%.cc=%.d) $(TESTS:%.cc=%.d)
+DEPS		= $(SRC:=.d) $(TESTS:=.d)
 
 RM			= rm -f
 CXX			?= clang++
 
-CXXFLAGS	= -std=c++14 -W -Wall -Werror -MMD -Isources/tests
+CXXFLAGS	= -std=c++17 -W -Wall -Werror -MMD -Isources/tests -Iuni-algo/include
 EMFLAGS		= -flto --bind
 
 NODEPS		= clean fclean
@@ -64,12 +64,18 @@ fclean: clean
 re:	clean
 	$(MAKE) all
 
-test: $(OBJ_TESTS)
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o /tmp/testsuite $(OBJ_TESTS)
-	/tmp/testsuite
+%.cc.o: %.cc
+	${CXX} ${CPPFLAGS} ${CXXFLAGS} -c -o $@ $^
+
+%.cpp.o: %.cpp
+	${CXX} ${CPPFLAGS} ${CXXFLAGS} -c -o $@ $^
 
 $(TARGET): $(OBJ_SRC)
 	ar r $(TARGET) $(OBJ_SRC)
 	ranlib $(TARGET)
+
+test: $(OBJ_TESTS)
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o /tmp/testsuite $(OBJ_TESTS)
+	/tmp/testsuite
 
 .PHONY: all clean wasm fclean re test

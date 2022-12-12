@@ -67,6 +67,9 @@ bool TextLayout::getDemoteNewlines(void) const
     return m_demoteNewlines;
 }
 
+#include "uni_algo/break_grapheme.h"
+#include "uni_algo/break_word.h"
+
 bool TextLayout::getJustifyText(void) const
 {
     return m_justifyText;
@@ -218,16 +221,16 @@ bool TextLayout::doesSoftWrap(unsigned row) const
 
 std::string const & TextLayout::getSource(void) const
 {
-    return m_source;
+    return m_source.toString();
 }
 
 std::string TextLayout::getText(void) const
 {
-    std::string str = m_lines.front().string;
+    std::string str = m_lines.front().string.toString();
 
     for (unsigned t = 1; t < m_lines.size(); ++t) {
         str += "\n";
-        str += m_lines.at(t).string;
+        str += m_lines.at(t).string.toString();
     }
 
     return str;
@@ -237,7 +240,7 @@ std::string const & TextLayout::getLine(unsigned row) const
 {
     assert(row < m_lines.size());
 
-    return m_lines.at(row).string;
+    return m_lines.at(row).string.toString();
 }
 
 unsigned TextLayout::getLineLength(unsigned row) const
@@ -251,7 +254,7 @@ std::string TextLayout::getLineSlice(unsigned row, unsigned start, unsigned end)
 {
     assert(row < m_lines.size());
 
-    return m_lines.at(row).string.substr(start, end - start);
+    return m_lines.at(row).string.toString().substr(start, end - start);
 }
 
 TokenLocator TextLayout::findTokenLocatorForPosition(Position const & position) const
@@ -645,9 +648,7 @@ TextOperation TextLayout::applyConfiguration(void)
 {
     assert(m_lines.size() > 0);
 
-    auto characterCount = m_source.size();
-
-    return this->spliceSource(0, characterCount, m_source);
+    return this->update(0, m_source.size(), m_source.size());
 }
 
 TextOperation TextLayout::clearSource(void)
@@ -655,16 +656,35 @@ TextOperation TextLayout::clearSource(void)
     return this->setSource("");
 }
 
+int TextLayout::setUtf8Source(std::string const & source) {
+    auto view = uni::views::grapheme::utf8(source);
+
+    return std::distance(view.begin(), view.end());
+}
+
 TextOperation TextLayout::setSource(std::string const & source)
 {
     assert(m_lines.size() > 0);
 
-    auto characterCount = m_source.size();
+    auto beforeSize = m_source.size();
+    m_source = source;
+    auto afterSize = m_source.size();
 
-    return this->spliceSource(0, characterCount, source);
+    return this->update(0, beforeSize, afterSize);
 }
 
+
 TextOperation TextLayout::spliceSource(unsigned start, unsigned removed, std::string const & added)
+{
+    auto beforeSize = m_source.size();
+    m_source.splice(start, removed, added);
+    auto afterSize = m_source.size();
+
+    auto addedSize = removed + afterSize - beforeSize;
+    return this->update(start, removed, addedSize);
+}
+
+TextOperation TextLayout::update(unsigned start, unsigned removed, unsigned added)
 {
     #define GET_CHARACTER_COUNT() m_source.size()
     #define GET_CHARACTER(OFFSET) m_source.at(OFFSET)
@@ -675,7 +695,7 @@ TextOperation TextLayout::spliceSource(unsigned start, unsigned removed, std::st
     #define IS_WHITESPACE() (!IS_END_OF_FILE() && (offsetChar == ' ' || offsetChar == '\t' || (m_demoteNewlines && (offsetChar == '\r' || offsetChar == '\n'))))
     #define IS_WORD() (!IS_END_OF_FILE() && !IS_WHITESPACE() && !IS_NEWLINE())
 
-    #define SHIFT_CHARACTER() ({ char c = offsetChar; SET_OFFSET(offset + 1); c; })
+    #define SHIFT_CHARACTER() ({ auto c = offsetChar; SET_OFFSET(offset + 1); c; })
     #define SHIFT_WHILE(COND, MAX) ({ std::string output; while (output.size() < MAX && COND) output += SHIFT_CHARACTER(); output; })
 
     #define SHIFT_WHITESPACES() SHIFT_WHILE(IS_WHITESPACE(), static_cast<unsigned>(-1))
@@ -689,10 +709,6 @@ TextOperation TextLayout::spliceSource(unsigned start, unsigned removed, std::st
 
     #define NEW_TOKEN(TYPE) ({ Token token = Token(TYPE); token.inputOffset = currentLine.inputLength; token.outputOffset = currentLine.outputLength; token; })
     #define PUSH_TOKEN(TOKEN) do { Token const & _token = (TOKEN); currentLine.tokens.push_back(_token); currentLine.inputLength += _token.inputLength; currentLine.outputLength += _token.outputLength; } while (0)
-
-    // Insert the updated patch into the source if we need to (ie not when just doing a reset)
-    if (&added != &m_source || start != 0 || removed != m_source.size())
-        m_source = m_source.substr(0, start) + added + m_source.substr(start + removed);
 
     // Create a structure that we will use to return a proper layout update (startingRow, removedLineCount & addedLines)
     TextOperation textOperation;
@@ -1007,10 +1023,10 @@ TextOperation TextLayout::spliceSource(unsigned start, unsigned removed, std::st
         textOperation.addedLineCount += 1;
         textOperation.addedLines.push_back(currentLine);
 
-        while (rowStart + textOperation.deletedLineCount != m_lines.size() && m_lines.at(rowStart + textOperation.deletedLineCount).inputOffset + added.size() < offset + removed)
+        while (rowStart + textOperation.deletedLineCount != m_lines.size() && m_lines.at(rowStart + textOperation.deletedLineCount).inputOffset + added < offset + removed)
             textOperation.deletedLineCount += 1;
 
-        if (rowStart + textOperation.deletedLineCount != m_lines.size() && m_lines.at(rowStart + textOperation.deletedLineCount).inputOffset + added.size() == offset + removed)
+        if (rowStart + textOperation.deletedLineCount != m_lines.size() && m_lines.at(rowStart + textOperation.deletedLineCount).inputOffset + added == offset + removed)
             break;
 
         if (!hasNewline && IS_END_OF_FILE()) {

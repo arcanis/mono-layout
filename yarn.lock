@@ -5,26 +5,10 @@ __metadata:
   version: 7
   cacheKey: 9
 
-"@manaflair/term-strings@npm:^0.10.0":
-  version: 0.10.0
-  resolution: "@manaflair/term-strings@npm:0.10.0"
-  dependencies:
-    babel-runtime: "npm:^6.23.0"
-    color-diff: "npm:^1.0.0"
-  bin:
-    term-strings: ./build/bin/term-strings.js
-    term-strings-seqdbg: ./build/bin/term-strings-seqdbg.js
-  checksum: 6ab982cfc9f9fda7ec92ddc50530336491c50e58dcb63a6e8a85dcc180bc35716784d470aa5c793760ebed4ed92f365b75543c05df92ad8c5d8075b0b8029737
-  languageName: node
-  linkType: hard
-
-"babel-runtime@npm:^6.23.0":
-  version: 6.26.0
-  resolution: "babel-runtime@npm:6.26.0"
-  dependencies:
-    core-js: "npm:^2.4.0"
-    regenerator-runtime: "npm:^0.11.0"
-  checksum: 9ff2870582894fa49190a1943e6be5beb659096ea393adab793f9d1733c4f44fd54c19e08f5bcff7416b241ca1ff89ebcea43c3a00daa61255001479e57d7554
+"@types/zen-observable@npm:^0.8.3":
+  version: 0.8.3
+  resolution: "@types/zen-observable@npm:0.8.3"
+  checksum: 8e99a0b0be6b385774229f3d51c9f1666ba52ca15c99baa781454e7cf1d39bb57277f18240ba417f865455ee1b599b208f0c6c579a23853fc3d9aefa5dfb5e3b
   languageName: node
   linkType: hard
 
@@ -32,6 +16,16 @@ __metadata:
   version: 0.4.2
   resolution: "balanced-match@npm:0.4.2"
   checksum: c69b617985be84fa9f80d903a6c5dd468465ca1c39f4e51b42ed5c79843b8f1c5af1aa3c23ee41aaceec20132f58dec12d5fb09b32b8d71f44b0fb11e3c63e94
+  languageName: node
+  linkType: hard
+
+"benchmark@npm:^2.1.4":
+  version: 2.1.4
+  resolution: "benchmark@npm:2.1.4"
+  dependencies:
+    lodash: "npm:^4.17.4"
+    platform: "npm:^1.3.3"
+  checksum: a22b5460f1519045ac2c1fbe1336ac7bc98426db4be05d13b7153640c17b71348b3ecb79877dfb051dd855fd2c661bdacda6ea7014d06ec1bdd4df55f46a2b04
   languageName: node
   linkType: hard
 
@@ -45,10 +39,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"color-diff@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "color-diff@npm:1.0.0"
-  checksum: cda6f65ab4d209b38502c8ced73d7536681a610b19a3970887f456e0d572bcc7c49ef6eda0cb06c1cc708790b00a614eb4930556259bf118884c9769f3e01943
+"color-diff@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "color-diff@npm:1.2.0"
+  checksum: fa5d5bc04d7fcce8234614c0055c77cd830eb0f3659c0616f72264f6988728176535c3cadb017bad9aa24c97723d1fe7bf8be7b9c4bf38b0ab3c816226e6451a
   languageName: node
   linkType: hard
 
@@ -56,13 +50,6 @@ __metadata:
   version: 0.0.1
   resolution: "concat-map@npm:0.0.1"
   checksum: 88222f18b3a68b71fe4473a146c8ed3315ec0488703104319c53543ad4668af3e79418ab79e2fa8032ee04c3eb45cc478815b89877a048cc5ba34e201bc15c35
-  languageName: node
-  linkType: hard
-
-"core-js@npm:^2.4.0":
-  version: 2.4.1
-  resolution: "core-js@npm:2.4.1"
-  checksum: 524c86a50a750e24a4d054ffcdacfdaff7c7c5959c1cbacd9c359d1c0b58949324e4c51b91c35f501667646c0d3b76b618f5480a39cb025e04d3659c21366c09
   languageName: node
   linkType: hard
 
@@ -111,6 +98,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash@npm:^4.17.4":
+  version: 4.17.21
+  resolution: "lodash@npm:4.17.21"
+  checksum: 3ac18e92108d68f88429fcddee609e42cf2b653583d9bac22308815a4cd6b185b89a0ad0d9b0c670c371d9d6b61571a98fee6b36e1db14e52766ca253ed9cba0
+  languageName: node
+  linkType: hard
+
 "minimatch@npm:^3.0.2":
   version: 3.0.3
   resolution: "minimatch@npm:3.0.3"
@@ -124,9 +118,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "mono-layout@workspace:."
   dependencies:
-    "@manaflair/term-strings": "npm:^0.10.0"
+    benchmark: "npm:^2.1.4"
     faker: "npm:^4.1.0"
     glob: "npm:^7.1.1"
+    term-strings: "npm:^0.14.1"
   languageName: unknown
   linkType: soft
 
@@ -146,10 +141,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"regenerator-runtime@npm:^0.11.0":
-  version: 0.11.1
-  resolution: "regenerator-runtime@npm:0.11.1"
-  checksum: 14664043fb2f0f41fa9349df06e962fc888657ea05ece28df05729fba0b9ea626e75547e317452454b80ef182bfe69b7c14d6717b0f7eb1c23d4d74aad9e186c
+"platform@npm:^1.3.3":
+  version: 1.3.6
+  resolution: "platform@npm:1.3.6"
+  checksum: 3aa67d72b8adae85896985e8b9f166ccc6bdbc67973e057c7f680f2da242371d4a1cc399c44d855b47e48445288b44645a746efdbfb0417062c71644e113262a
+  languageName: node
+  linkType: hard
+
+"term-strings@npm:^0.14.1":
+  version: 0.14.1
+  resolution: "term-strings@npm:0.14.1"
+  dependencies:
+    "@types/zen-observable": "npm:^0.8.3"
+    color-diff: "npm:^1.2.0"
+    zen-observable: "npm:^0.8.15"
+  bin:
+    term-strings: ./build/bin/term-strings.js
+    term-strings-seqdbg: ./build/bin/term-strings-seqdbg.js
+  checksum: c7b7080d80c8410d0db7cffccf50937c373eed424dac25f8e682f70e7a8167da77b2f20ccf4a5d8bb63fe15f9c67099c58ea1b569c712656a0a26233328cd396
   languageName: node
   linkType: hard
 
@@ -157,5 +166,12 @@ __metadata:
   version: 1.0.2
   resolution: "wrappy@npm:1.0.2"
   checksum: 37d243a577dfeee20586eae1e3208dfb4e4cea1211a2a4116a19b50d91e619ff3dbc5ec934e28ca9baaa11a65df826c8d65c5fd1bb81f0ce0dadb469d47061c2
+  languageName: node
+  linkType: hard
+
+"zen-observable@npm:^0.8.15":
+  version: 0.8.15
+  resolution: "zen-observable@npm:0.8.15"
+  checksum: 82d09c1bb61fdaef03edb3b96f2af90ec9ddcdb35616df249f9d7aaef3aa4e061c7ab8733678b184639a914d47ba6f77741072c1d1ebea93dcd299d85fcf969d
   languageName: node
   linkType: hard

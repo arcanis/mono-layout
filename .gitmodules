@@ -1,0 +1,3 @@
+[submodule "uni-algo"]
+	path = uni-algo
+	url = https://github.com/uni-algo/uni-algo.git

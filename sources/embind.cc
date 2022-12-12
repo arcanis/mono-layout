@@ -77,6 +77,7 @@ EMSCRIPTEN_BINDINGS(text_layout)
         .function("applyConfiguration", &TextLayout::applyConfiguration)
 
         .function("clearSource", &TextLayout::clearSource)
+        .function("setUtf8Source", &TextLayout::setUtf8Source)
         .function("setSource", &TextLayout::setSource)
         .function("spliceSource", &TextLayout::spliceSource)
         ;

@@ -45,6 +45,6 @@ void TextOutput::apply(TextOperation const & textOperation)
     m_lines.erase(m_lines.begin() + textOperation.startingRow, m_lines.begin() + textOperation.startingRow + textOperation.deletedLineCount);
 
     for (unsigned t = 0; t < textOperation.addedLineCount; ++t) {
-        m_lines.insert(m_lines.begin() + textOperation.startingRow + t, textOperation.addedLines.at(t).string);
+        m_lines.insert(m_lines.begin() + textOperation.startingRow + t, textOperation.addedLines.at(t).string.toString());
     }
 }
