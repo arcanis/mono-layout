@@ -745,6 +745,7 @@ TextOperation TextLayout::update(unsigned start, unsigned removed, unsigned adde
 
         textOperation.addedLineCount += 1;
         textOperation.addedLines.push_back(Line{ Token(TOKEN_DYNAMIC) });
+        textOperation.addedLines.back().inputLength = GET_CHARACTER_COUNT();
 
     } else while (offset < offsetEnd) {
 
@@ -1081,6 +1082,18 @@ void TextLayout::apply(TextOperation const & textOperation)
 void TextLayout::dump(std::vector<Line> const & lines) const
 {
     std::cout << "========================================================" << std::endl;
+    std::cout << "CONFIGURATION" << std::endl;
+    std::cout << "========================================================" << std::endl;
+    std::cout << std::endl;
+    std::cout << "    Soft Wrap:                " << m_softWrap << std::endl;
+    std::cout << "    Collapse Whitespaces:     " << m_collapseWhitespaces << std::endl;
+    std::cout << "    Preserve Leading Spaces:  " << m_preserveLeadingSpaces << std::endl;
+    std::cout << "    Preserve Trailing Spaces: " << m_preserveTrailingSpaces << std::endl;
+    std::cout << "    Allow Word Breaks:        " << m_allowWordBreaks << std::endl;
+    std::cout << "    Demote Newlines:          " << m_demoteNewlines << std::endl;
+    std::cout << "    Justify Text:             " << m_justifyText << std::endl;
+    std::cout << std::endl;
+    std::cout << "========================================================" << std::endl;
     std::cout << "LINE COUNT: " << lines.size() << std::endl;
     std::cout << "========================================================" << std::endl;
 
@@ -1089,6 +1102,7 @@ void TextLayout::dump(std::vector<Line> const & lines) const
         auto const & line = lines.at(s);
 
         std::cout
+            << std::endl
             << "Line #" << s << std::endl
             << "    inputOffset  = " << line.inputOffset << std::endl
             << "    inputLength  = " << line.inputLength << std::endl
@@ -1101,6 +1115,7 @@ void TextLayout::dump(std::vector<Line> const & lines) const
             auto const & token = line.tokens.at(t);
 
             std::cout
+                << std::endl
                 << "    Token #" << t << std::endl
                 << "        inputOffset  = " << token.inputOffset << std::endl
                 << "        inputLength  = " << token.inputLength << std::endl

@@ -79,5 +79,9 @@ EMSCRIPTEN_BINDINGS(text_layout)
         .function("clearSource", &TextLayout::clearSource)
         .function("setSource", &TextLayout::setSource)
         .function("spliceSource", &TextLayout::spliceSource)
+
+#ifdef DEBUG
+        .function("dump", select_overload<void () const>(&TextLayout::dump))
+#endif
         ;
 }

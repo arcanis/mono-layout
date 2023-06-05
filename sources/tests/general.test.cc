@@ -61,6 +61,31 @@ TEST_CASE("it should correctly wrap text")
     ASSERT_EQ(TEXT(), "ABCD\nEFGH\nIJKL\nMNOP\nQRST\nUVWX\nYZ");
 }
 
+TEST_CASE("it should support zero-size column mode")
+{
+    SETUP("Hello world");
+
+    layout.setColumns(0);
+    layout.setSoftWrap(true);
+    RESET();
+
+    ASSERT_EQ(TEXT(), "");
+}
+
+TEST_CASE("it should support leaving zero-size column mode")
+{
+    SETUP("Hello world");
+
+    layout.setColumns(0);
+    layout.setSoftWrap(true);
+    RESET();
+
+    layout.setSoftWrap(false);
+    RESET();
+
+    ASSERT_EQ(TEXT(), "Hello world");
+}
+
 TEST_CASE("it should avoid breaking words unless allowed to")
 {
     SETUP("Horse Tiger Snake Zebra Mouse Sheep Whale Panda");
