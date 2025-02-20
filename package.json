@@ -1,7 +1,7 @@
 {
   "name": "mono-layout",
-  "version": "0.14.3",
-  "packageManager": "yarn@4.1.0+sha224.bc24d7f5afc738464f3d4e95f4e6e7829a35cee54a0fd527ea5baa83",
+  "version": "0.14.4",
+  "packageManager": "yarn@4.6.0+sha256.eaf1eeabc164a44ca0b65dbdccd54af7e55f3ff9294b3ff318d5aaec92f2b20b",
   "license": "MIT",
   "exports": {
     ".": "./entry/async.js",

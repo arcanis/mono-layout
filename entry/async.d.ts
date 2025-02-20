@@ -2,4 +2,4 @@ import type {Context} from './common';
 
 export type * from './common';
 
-export function createContext(wasm: BufferSource): Promise<Context>;
+export function createContext(wasm: ArrayBufferView | ArrayBuffer): Promise<Context>;
