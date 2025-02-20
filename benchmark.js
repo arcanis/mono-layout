@@ -51,12 +51,6 @@ benchmark(`Layout a small ascii string`, () => {
     textLayout.setSource(`Hello World`);
 });
 
-benchmark(`Layout a large ascii text`, () => {
-    return createLayout();
-}, textLayout => {
-    textLayout.setSource(lorem);
-});
-
 benchmark(`Segment a large ascii text (${lorem.length} bytes) using Intl.Segmenter`, () => {
     return new Intl.Segmenter(`en`);
 }, segmenter => {
@@ -66,7 +60,7 @@ benchmark(`Segment a large ascii text (${lorem.length} bytes) using Intl.Segment
 benchmark(`Segment a large ascii text (${lorem.length} bytes) using uni-algo`, () => {
     return createLayout();
 }, textLayout => {
-    textLayout.setUtf8Source(lorem);
+    textLayout.setSource(lorem);
 });
 
 benchmark(`Segment a large unicode text (${(new TextEncoder().encode(loremUnicode)).length} bytes) using Intl.Segmenter`, () => {
@@ -78,5 +72,5 @@ benchmark(`Segment a large unicode text (${(new TextEncoder().encode(loremUnicod
 benchmark(`Segment a large unicode text (${(new TextEncoder().encode(loremUnicode)).length} bytes) using uni-algo`, () => {
     return createLayout();
 }, textLayout => {
-    textLayout.setUtf8Source(loremUnicode);
+    textLayout.setSource(loremUnicode);
 });
